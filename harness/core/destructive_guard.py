@@ -17,7 +17,7 @@ from hookio import HookInputError, read_hook_input  # noqa: E402
 
 NAME = "destructive-command-guard"
 MAX_PATTERNS = 200
-DEFAULT_LIST = Path(__file__).resolve().parent.parent / "destructive-commands.txt"
+DEFAULT_LIST = Path(__file__).resolve().parent.parent / "policy" / "destructive-commands.txt"
 _SEPARATORS = re.compile(r"&&|\|\||;|\||\n")
 _EDGE_CHARS = "'\"`()"
 
@@ -84,6 +84,11 @@ def load_patterns(path) -> list:
     if len(patterns) > MAX_PATTERNS:
         raise ListLoadError(path, f"the list has {len(patterns)} patterns; the maximum is {MAX_PATTERNS}")
     return patterns
+
+
+def format_list(patterns) -> str:
+    """Canonical list text; ``load_patterns`` on it gives equal patterns (Property 44)."""
+    return "".join(pattern.text + "\n" for pattern in patterns)
 
 
 def match_segment(pattern: Pattern, segment) -> bool:

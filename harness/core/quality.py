@@ -16,7 +16,7 @@ from runner import run_with_deadline, tail_lines  # noqa: E402
 NAME = "quality-on-save"
 DEADLINE_SECONDS = 110.0
 COMMANDS_FILE = "scripts/project-commands.env"
-CONF_FILE = Path(__file__).resolve().parent.parent / "quality-hook.conf"
+CONF_FILE = Path(__file__).resolve().parent.parent.parent / ".kiro" / "hooks" / "scripts" / "quality-hook.conf"
 DEFAULT_TEST_FILE_REGEX = r"(^|/)(test_[^/]+\.py|[^/]+_test\.go|[^/]+\.(test|spec)\.[jt]sx?)$"
 _PLACEHOLDER_RE = re.compile(r"\{\{[A-Z][A-Z0-9_]{0,63}\}\}")
 _LINE_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*)=(?:"(.*)"|(.*))\s*$')

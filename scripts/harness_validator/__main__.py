@@ -13,14 +13,14 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
+from . import capabilities_check, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
 CONFIG_PATH = "scripts/validator-config.json"
-LIB_DIR = ".kiro/hooks/scripts/lib"
-DESTRUCTIVE_LIST = ".kiro/hooks/scripts/destructive-commands.txt"
-RISKY_LIST = ".kiro/hooks/scripts/risky-tools.conf"
+LIB_DIR = "harness/core"
+DESTRUCTIVE_LIST = "harness/policy/destructive-commands.txt"
+RISKY_LIST = "harness/policy/risky-tools.conf"
 RISKY_SCRIPT = "risky-tool-guard.sh"
 README = "README.md"
 
@@ -93,7 +93,7 @@ def _json_pairs(text: str):
 
 
 def load_lib_module(root: Path, name: str):
-    """Load a guard module from .kiro/hooks/scripts/lib so parsing logic is shared."""
+    """Load a guard module from harness/core so parsing logic is shared."""
     lib = root / LIB_DIR
     path = lib / f"{name}.py"
     if not path.is_file():
@@ -102,7 +102,7 @@ def load_lib_module(root: Path, name: str):
     if added:
         sys.path.insert(0, str(lib))
     try:
-        for dependency in ("hookio",):
+        for dependency in ("hookio", "capabilities", "event_model"):
             sys.modules.pop(dependency, None)
         module_name = f"_harness_lib_{name}"
         spec = importlib.util.spec_from_file_location(module_name, path)
@@ -118,7 +118,8 @@ def load_lib_module(root: Path, name: str):
     finally:
         if added:
             sys.path.remove(str(lib))
-        sys.modules.pop("hookio", None)
+        for dependency in ("hookio", "capabilities", "event_model"):
+            sys.modules.pop(dependency, None)
 
 
 # --- checkers -------------------------------------------------------------
@@ -187,6 +188,14 @@ def check_mcp_file(run: Run, config) -> None:
     run.guarded("secret scan", MCP_PATH, _secret_findings, MCP_PATH, _json_pairs(text), config.secret_patterns)
 
 
+def check_capabilities(run: Run) -> None:
+    path = run.root / "harness" / "capabilities.json"
+    if not path.is_file():
+        run.findings.append(error("harness/capabilities.json", "-", "CAP-FIELD", "Capability_Matrix is missing"))
+        return
+    run.guarded("capabilities", "harness/capabilities.json", capabilities_check.check_capabilities, "harness/capabilities.json", path.read_text(encoding="utf-8"))
+
+
 def check_verification_records(run: Run) -> None:
     directory = run.root / "docs/verification"
     for path in sorted(directory.glob("*/*/*.md")) if directory.is_dir() else []:
@@ -238,6 +247,11 @@ def check_risky_list(run: Run) -> list:
         return [error(RISKY_LIST, field, "RISKY-LIST", f"Risky_Tool_List: {exc.detail}")]
     findings = []
     lines = text.splitlines()
+    caps_module = load_lib_module(run.root, "capabilities")
+    try:
+        caps = caps_module.load_capabilities(run.root)
+    except caps_module.CapabilityError as exc:
+        return [error(RISKY_LIST, "-", "RISKY-LIST", f"cannot check entries without the Capability_Matrix: {exc}")]
     for entry in entries:
         above = lines[entry.line_no - 2].strip() if entry.line_no >= 2 else ""
         match = re.match(r"^#\s*example:\s*(.*)$", above)
@@ -249,8 +263,12 @@ def check_risky_list(run: Run) -> list:
                 example = json.loads(match.group(1))
                 if not isinstance(example, dict):
                     problem = "example comment must hold a JSON object"
-                elif not guard.matches(entry, entry.tool, example):
-                    problem = "example tool_input does not match the entry"
+                else:
+                    subject = guard.example_subject(entry, caps)
+                    if subject is None:
+                        problem = "tool is not in any Agent's Tool_Map in harness/capabilities.json"
+                    elif not guard.matches(entry, subject[1], example, subject[0], subject[2]):
+                        problem = "example tool_input does not match the entry"
             except json.JSONDecodeError as exc:
                 problem = f"example comment is not valid JSON: {exc.msg}"
         if problem:
@@ -267,15 +285,16 @@ def check_risky_list(run: Run) -> list:
         except re.error:
             continue  # reported by hook_rules
     for entry in entries:
-        if not any(c.fullmatch(entry.tool) for c in compiled):
-            findings.append(
-                error(
-                    RISKY_LIST,
-                    f"line {entry.line_no}",
-                    "RISKY-COVER",
-                    f"tool {entry.tool} is not covered by the Risky_Tool_Guard matcher",
+        for tool in guard.kiro_tools(entry, caps):
+            if not any(c.fullmatch(tool) for c in compiled):
+                findings.append(
+                    error(
+                        RISKY_LIST,
+                        f"line {entry.line_no}",
+                        "RISKY-COVER",
+                        f"tool {tool} is not covered by the Risky_Tool_Guard matcher",
+                    )
                 )
-            )
     return findings
 
 
@@ -342,6 +361,7 @@ def validate(root) -> tuple:
     check_verification_records(run)
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)
+    run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
     run.guarded("placeholder scan", README, check_placeholders, run)
     return run.findings, len(run.files)
 

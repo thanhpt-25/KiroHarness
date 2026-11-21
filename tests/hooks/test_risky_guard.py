@@ -12,10 +12,13 @@ import time
 import unittest
 from pathlib import Path
 
-from tests._support import HOOK_SCRIPTS, detail, run_script, tool_call
+from tests._support import HOOK_SCRIPTS, POLICY, TemplateCopy, detail, run_script, tool_call
+
+import capabilities  # noqa: E402
+import risky_guard  # noqa: E402
 
 SCRIPT = HOOK_SCRIPTS / "risky-tool-guard.sh"
-LIST = HOOK_SCRIPTS / "risky-tools.conf"
+LIST = POLICY / "risky-tools.conf"
 
 NON_MATCHING = [
     ("read_file", {"path": "README.md"}),
@@ -54,19 +57,27 @@ class RiskyGuard(unittest.TestCase):
     def test_every_entry_asks_for_its_example(self):
         cases = example_cases()
         self.assertGreater(len(cases), 0)
+        caps = capabilities.load_capabilities()
+        ran = 0
         for tool, tool_input, line in cases:
             with self.subTest(entry=line):
                 self.assertIsNotNone(tool_input, f"entry {line!r} has no # example: comment")
-                result = run_script(SCRIPT, tool_call(tool, tool_input))
+                entry = risky_guard.parse_list(line)[0]
+                subject = risky_guard.example_subject(entry, caps, agent="kiro")
+                if subject is None:
+                    continue  # applies to another Agent only; tests/adapters covers it
+                ran += 1
+                result = run_script(SCRIPT, tool_call(subject[1], tool_input))
                 self.assertEqual(result.returncode, 0)
                 output = decision(result.stdout)
                 self.assertIsNotNone(output, detail((tool, tool_input), "ask", "no output"))
                 self.assertEqual(output["permissionDecision"], "ask")
                 self.assertIn(tool, output["permissionDecisionReason"])
+        self.assertGreaterEqual(ran, 5)
 
     def test_matched_entry_line_is_in_the_reason(self):
         result = run_script(SCRIPT, tool_call("delete_file", {"targetFile": "a.txt"}))
-        self.assertIn("delete_file | File deletion | *", decision(result.stdout)["permissionDecisionReason"])
+        self.assertIn("category:delete | File deletion | *", decision(result.stdout)["permissionDecisionReason"])
 
     def test_non_matching_calls_produce_no_decision(self):
         self.assertGreaterEqual(len(NON_MATCHING), 5)
@@ -86,21 +97,16 @@ class RiskyGuard(unittest.TestCase):
                 self.assertIn("could not be parsed", output["permissionDecisionReason"])
                 self.assertIn("parse error", result.stderr.decode())
 
-    def _copy_scripts(self, tmp):
-        scripts = Path(tmp) / "scripts"
-        shutil.copytree(HOOK_SCRIPTS, scripts, ignore=shutil.ignore_patterns("__pycache__"))
-        return scripts
-
     def test_malformed_list_asks_and_names_the_file(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            scripts = self._copy_scripts(tmp)
-            (scripts / "risky-tools.conf").write_text("delete_file has no separators\n")
-            result = run_script(scripts / "risky-tool-guard.sh", tool_call("read_file", {"path": "a"}))
+        with TemplateCopy() as root:
+            conf = root / "harness/policy/risky-tools.conf"
+            conf.write_text("delete_file has no separators\n")
+            result = run_script(root / ".kiro/hooks/scripts/risky-tool-guard.sh", tool_call("read_file", {"path": "a"}), cwd=root)
             self.assertEqual(result.returncode, 0)
             output = decision(result.stdout)
             self.assertEqual(output["permissionDecision"], "ask")
-            self.assertIn(str(scripts / "risky-tools.conf"), output["permissionDecisionReason"])
-            self.assertIn(str(scripts / "risky-tools.conf"), result.stderr.decode())
+            self.assertIn(str(conf), output["permissionDecisionReason"])
+            self.assertIn(str(conf), result.stderr.decode())
 
     def test_extra_entry_adds_one_generated_case(self):
         with tempfile.TemporaryDirectory() as tmp:

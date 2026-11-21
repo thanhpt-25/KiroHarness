@@ -6,4 +6,4 @@ if ! command -v python3 >/dev/null 2>&1; then
   echo "post-task-tests: python3 not found" >&2
   exit 2
 fi
-exec python3 -I "$dir/lib/post_task.py"
+exec python3 -I "$dir/../../../harness/core/post_task.py"

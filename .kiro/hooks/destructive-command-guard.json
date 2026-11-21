@@ -10,7 +10,7 @@
         "command": "sh .kiro/hooks/scripts/destructive-guard.sh"
       },
       "timeout": 5,
-      "description": "Blocks shell commands on .kiro/hooks/scripts/destructive-commands.txt (exit 2)."
+      "description": "Blocks shell commands on harness/policy/destructive-commands.txt (exit 2)."
     }
   ]
 }

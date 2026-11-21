@@ -32,5 +32,5 @@ inclusion: always
 - Ask before deleting files or data, rewriting git history, force-pushing,
   deploying, publishing, or changing permissions.
 - The Destructive_Command_Guard hook blocks commands on
-  `.kiro/hooks/scripts/destructive-commands.txt`. Do not try to work around a
+  `harness/policy/destructive-commands.txt`. Do not try to work around a
   block; tell the user what was blocked and why.

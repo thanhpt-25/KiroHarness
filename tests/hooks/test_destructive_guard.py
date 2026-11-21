@@ -12,10 +12,10 @@ import time
 import unittest
 from pathlib import Path
 
-from tests._support import HOOK_SCRIPTS, detail, run_script, tool_call
+from tests._support import HOOK_SCRIPTS, POLICY, TemplateCopy, detail, run_script, tool_call
 
 SCRIPT = HOOK_SCRIPTS / "destructive-guard.sh"
-LIST = HOOK_SCRIPTS / "destructive-commands.txt"
+LIST = POLICY / "destructive-commands.txt"
 
 SAFE_COMMANDS = [
     "rm -rf ./build",
@@ -81,24 +81,21 @@ class DestructiveGuard(unittest.TestCase):
         self.assertEqual((result.returncode, result.stderr), (0, b""))
 
     def test_missing_list_blocks_and_names_the_path(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            scripts = Path(tmp) / "scripts"
-            shutil.copytree(HOOK_SCRIPTS, scripts, ignore=shutil.ignore_patterns("__pycache__"))
-            (scripts / "destructive-commands.txt").unlink()
-            result = run_script(scripts / "destructive-guard.sh", tool_call("execute_bash", {"command": "ls"}))
+        with TemplateCopy() as root:
+            policy = root / "harness/policy/destructive-commands.txt"
+            policy.unlink()
+            result = run_script(root / ".kiro/hooks/scripts/destructive-guard.sh", tool_call("execute_bash", {"command": "ls"}), cwd=root)
             self.assertEqual(result.returncode, 2)
-            self.assertIn(str(scripts / "destructive-commands.txt"), result.stderr.decode())
+            self.assertIn(str(policy), result.stderr.decode())
             self.assertIn("could not load list", result.stderr.decode())
 
     def test_long_command_against_200_patterns_finishes_within_2_seconds(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            scripts = Path(tmp) / "scripts"
-            shutil.copytree(HOOK_SCRIPTS, scripts, ignore=shutil.ignore_patterns("__pycache__"))
+        with TemplateCopy() as root:
             patterns = [f"tool{i} --flag{i} target{i}" for i in range(200)]
-            (scripts / "destructive-commands.txt").write_text("\n".join(patterns) + "\n")
+            (root / "harness/policy/destructive-commands.txt").write_text("\n".join(patterns) + "\n")
             command = ("echo word " * 1000)[:10000]
             start = time.monotonic()
-            result = run_script(scripts / "destructive-guard.sh", tool_call("execute_bash", {"command": command}))
+            result = run_script(root / ".kiro/hooks/scripts/destructive-guard.sh", tool_call("execute_bash", {"command": command}), cwd=root)
             elapsed = time.monotonic() - start
             self.assertEqual(result.returncode, 0, result.stderr.decode())
             self.assertLess(elapsed, 2.0, detail("10,000-character command", "< 2 s", f"{elapsed:.2f} s"))

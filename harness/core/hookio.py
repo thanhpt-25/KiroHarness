@@ -29,8 +29,8 @@ class HookInput:
 
 
 def workspace_root() -> Path:
-    """The workspace root: the directory that contains ``.kiro/hooks/scripts/``."""
-    return Path(__file__).resolve().parent.parent.parent.parent.parent
+    """The workspace root: the directory that contains ``harness/core/``."""
+    return Path(__file__).resolve().parent.parent.parent
 
 
 def _first_str(raw: dict, *keys):

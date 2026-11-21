@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "note": "Machine-readable Capability_Matrix (agent-harness-platform Requirement 9.1). status is 'documented' when the contract was read from the vendor's official documentation but not yet confirmed by a recorded Manual_Check_Record, and 'verified' once such a record exists. See docs/reference/capabilities.md.",
+  "agents": {
+    "kiro": {
+      "label": "Kiro IDE",
+      "status": "documented",
+      "verified": {
+        "min": "1.1.14",
+        "max": "1.1.14",
+        "date": "2026-11-21",
+        "source": "Template design research (third-party measurement of exit-code blocking on 1.1.14); IDE smoke test pending, see docs/verification/kiro/RUNBOOK.md"
+      },
+      "guidance": {
+        "always": ".kiro/steering/*.md (inclusion: always)",
+        "fileMatch": ".kiro/steering/*.md (inclusion: fileMatch, fileMatchPattern)",
+        "auto": ".kiro/steering/*.md (inclusion: auto, name, description)",
+        "manual": ".kiro/steering/*.md (inclusion: manual)"
+      },
+      "events": {
+        "session_start": "SessionStart",
+        "prompt_submit": "UserPromptSubmit",
+        "pre_tool": "PreToolUse",
+        "post_tool": "PostToolUse",
+        "file_saved": "PostFileSave",
+        "task_done": "PostTaskExec",
+        "stop": "Stop"
+      },
+      "output": {
+        "deny": {"exit": 2, "channel": "stderr"},
+        "ask": {"exit": 0, "channel": "stdout", "json": "hookSpecificOutput", "include_event_name": false}
+      },
+      "tool_map": {
+        "execute_bash": {"category": "shell", "command": "command"},
+        "execute_pwsh": {"category": "shell", "command": "command"},
+        "control_bash_process": {"category": "shell", "command": "command"},
+        "delete_file": {"category": "delete", "paths": ["targetFile"]},
+        "web_fetch": {"category": "web", "url": "url"}
+      },
+      "tool_prefix_map": {"@": "mcp"},
+      "mcp": {"path": ".kiro/settings/mcp.json", "root_key": "mcpServers"},
+      "permissions": null,
+      "protection": {
+        "destructive": "enforced",
+        "risky": "enforced",
+        "prompt_secrets": "enforced",
+        "protected_paths": "partial"
+      },
+      "gaps": [
+        "Kiro file read and write tool IDs are not yet recorded, so protected-path checks cover shell and delete tools only. Import payloads with scripts/import-payloads.sh and extend tool_map."
+      ]
+    },
+    "claude-code": {
+      "label": "Claude Code",
+      "status": "documented",
+      "verified": {
+        "min": null,
+        "max": null,
+        "date": "2026-11-21",
+        "source": "https://code.claude.com/docs/en/hooks, /permissions, /mcp, /memory read on 2026-11-21; no Manual_Check_Record yet"
+      },
+      "guidance": {
+        "always": "AGENTS.md imported from CLAUDE.md (@AGENTS.md)",
+        "fileMatch": ".claude/rules/*.md with a paths field",
+        "auto": ".claude/rules/*.md without paths (loaded every session); description-triggered loading needs a skill, not generated",
+        "manual": "linked from AGENTS.md, not loaded automatically"
+      },
+      "events": {
+        "session_start": "SessionStart",
+        "prompt_submit": "UserPromptSubmit",
+        "pre_tool": "PreToolUse",
+        "post_tool": "PostToolUse",
+        "stop": "Stop"
+      },
+      "output": {
+        "deny": {"exit": 2, "channel": "stderr"},
+        "ask": {"exit": 0, "channel": "stdout", "json": "hookSpecificOutput", "include_event_name": true}
+      },
+      "tool_map": {
+        "Bash": {"category": "shell", "command": "command"},
+        "PowerShell": {"category": "shell", "command": "command"},
+        "Read": {"category": "read", "paths": ["file_path"]},
+        "Glob": {"category": "read", "paths": ["path"]},
+        "Grep": {"category": "read", "paths": ["path"]},
+        "Write": {"category": "write", "paths": ["file_path"]},
+        "Edit": {"category": "write", "paths": ["file_path"]},
+        "MultiEdit": {"category": "write", "paths": ["file_path"]},
+        "NotebookEdit": {"category": "write", "paths": ["notebook_path"]},
+        "WebFetch": {"category": "web", "url": "url"}
+      },
+      "tool_prefix_map": {"mcp__": "mcp"},
+      "mcp": {"path": ".mcp.json", "root_key": "mcpServers"},
+      "permissions": {"path": ".claude/settings.json", "key": "permissions", "rules": ["allow", "ask", "deny"]},
+      "hooks_file": ".claude/settings.json",
+      "protection": {
+        "destructive": "enforced",
+        "risky": "enforced",
+        "prompt_secrets": "enforced",
+        "protected_paths": "enforced"
+      },
+      "gaps": [
+        "Bash deny rules are prefix patterns and can be bypassed by rewriting a command; the hook is the stronger layer."
+      ]
+    }
+  },
+  "deferred": [
+    {"agent": "cursor", "reason": "Official documentation was not reachable from the build environment on 2026-11-21; no payload recorded. Add after Task 7 verification."},
+    {"agent": "copilot", "reason": "Same as cursor."},
+    {"agent": "codex", "reason": "Same as cursor."},
+    {"agent": "gemini", "reason": "Same as cursor."}
+  ]
+}

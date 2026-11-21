@@ -4,7 +4,7 @@
 # Exit 0 only when the validator reports zero errors and every test passes.
 dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd) || exit 2
 root=${HARNESS_VALIDATE_ROOT:-$(CDPATH='' cd -- "$dir/.." && pwd)} || exit 2
-test_dirs=${HARNESS_TEST_DIRS:-"tests/hooks tests/validator"}
+test_dirs=${HARNESS_TEST_DIRS:-"tests/hooks tests/validator tests/core"}
 if ! command -v python3 >/dev/null 2>&1; then
   echo "validate: python3 not found (Python 3.10 or newer is required)" >&2
   exit 2

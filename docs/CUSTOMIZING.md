@@ -172,7 +172,7 @@ A command hook reads JSON on standard input. For a shell tool call on
 ```
 
 Older Kiro builds send `toolName` and `toolArgs`; the scripts in
-`.kiro/hooks/scripts/lib/hookio.py` accept both.
+`harness/core/hookio.py` accept both.
 
 ### Exit codes and permission decisions
 
@@ -232,7 +232,7 @@ script tests, which read both lists at run time and test every entry.
 
 ### Destructive_Command_List
 
-Location: `.kiro/hooks/scripts/destructive-commands.txt`. One pattern per line;
+Location: `harness/policy/destructive-commands.txt`. One pattern per line;
 a command is blocked when the pattern's words appear in order in one command
 segment, ignoring case and extra spaces. Maximum 200 patterns.
 
@@ -251,7 +251,7 @@ git clean -fd
 
 ### Risky_Tool_List
 
-Location: `.kiro/hooks/scripts/risky-tools.conf`. Each entry is
+Location: `harness/policy/risky-tools.conf`. Each entry is
 `<tool> | <reason> | <match>`, with an `# example:` comment directly above it
 that holds a `tool_input` the entry must match. `<match>` is `*`,
 `regex <field> <python-regex>`, or `host-not-in <field> <host> ...`.

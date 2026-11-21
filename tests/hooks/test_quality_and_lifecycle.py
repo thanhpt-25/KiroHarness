@@ -33,7 +33,7 @@ def save_event(path: str) -> bytes:
 
 
 def load_lib(root: Path, name: str):
-    lib = str(root / ".kiro/hooks/scripts/lib")
+    lib = str(root / "harness/core")
     sys.path.insert(0, lib)
     try:
         for module in ("hookio", "runner", "quality", name):

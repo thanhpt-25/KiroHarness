@@ -15,11 +15,14 @@ from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from capabilities import CapabilityError, agent_entry, classify, load_capabilities, tools_in_category  # noqa: E402
+from event_model import CATEGORIES  # noqa: E402
 from hookio import HookInputError, read_hook_input  # noqa: E402
 
 NAME = "risky-tool-guard"
-DEFAULT_LIST = Path(__file__).resolve().parent.parent / "risky-tools.conf"
+DEFAULT_LIST = Path(__file__).resolve().parent.parent / "policy" / "risky-tools.conf"
 _SPLIT_RE = re.compile(r"\s+\|\s+")
+_AGENT_TOOL_RE = re.compile(r"^([a-z][a-z0-9-]*):(.+)$")
 
 
 class Match:
@@ -95,10 +98,28 @@ def parse_list(text: str) -> list:
         tool, reason, match_text = (p.strip() for p in parts)
         if any(c.isspace() for c in tool):
             raise RiskyListError(line_no, f"tool name {tool!r} must not contain spaces")
+        if tool.startswith("category:") and tool[len("category:"):] not in CATEGORIES:
+            raise RiskyListError(line_no, f"unknown category in {tool!r}; use one of {', '.join(CATEGORIES)}")
         entries.append(RiskyEntry(tool, reason, _parse_match(match_text, line_no), line, line_no))
     if not entries:
         raise RiskyListError(None, "the list contains zero entries")
     return entries
+
+
+def format_entry(entry: RiskyEntry) -> str:
+    """Canonical text of an entry; ``parse_list(format_entry(e))`` gives an equal entry (Property 44)."""
+    match = entry.match
+    if isinstance(match, AnyArgs):
+        text = "*"
+    elif isinstance(match, RegexArg):
+        text = f"regex {match.field} {match.regex.pattern}"
+    else:
+        text = f"host-not-in {match.field} " + " ".join(sorted(match.hosts))
+    return f"{entry.tool} | {entry.reason} | {text}"
+
+
+def format_list(entries) -> str:
+    return "".join(format_entry(entry) + "\n" for entry in entries)
 
 
 def load_list(path) -> list:
@@ -138,8 +159,58 @@ def host_allowed(url, hosts) -> bool:
     return any(host == h or host.endswith("." + h) for h in hosts)
 
 
-def matches(entry: RiskyEntry, tool_name: str, tool_input: dict) -> bool:
-    if entry.tool != tool_name:
+def tool_selector(tool: str):
+    """Split an entry's tool column into ``(kind, agent, value)``.
+
+    ``category:<name>`` selects a Tool_Category for every Agent; ``<agent>:<tool>``
+    selects one Agent's native tool ID; anything else is a Kiro tool ID, which
+    keeps its original meaning (Requirement 5.2).
+    """
+    if tool.startswith("category:"):
+        return "category", None, tool[len("category:"):]
+    found = _AGENT_TOOL_RE.match(tool)
+    if found and not tool.startswith("@"):
+        return "agent", found.group(1), found.group(2)
+    return "agent", "kiro", tool
+
+
+def example_subject(entry: RiskyEntry, caps: dict, agent=None):
+    """A ``(agent, tool_id, category)`` that the entry applies to, or None.
+
+    With ``agent`` set, only that Agent is considered. Used by tests and the
+    validator to turn an entry's ``# example:`` input into a concrete call.
+    """
+    kind, entry_agent, value = tool_selector(entry.tool)
+    agents = caps.get("agents", {})
+    if kind == "category":
+        for name in ([agent] if agent else list(agents)):
+            tools = tools_in_category(agents.get(name, {}), value)
+            if tools:
+                return name, tools[0], value
+        return None
+    if (agent and entry_agent != agent) or entry_agent not in agents:
+        return None
+    category, _mapping = classify(agents[entry_agent], value)
+    return entry_agent, value, category
+
+
+def kiro_tools(entry: RiskyEntry, caps: dict) -> list:
+    """The Kiro tool IDs an entry applies to (for matcher coverage checks)."""
+    kind, entry_agent, value = tool_selector(entry.tool)
+    if kind == "category":
+        return tools_in_category(caps.get("agents", {}).get("kiro", {}), value)
+    return [value] if entry_agent == "kiro" else []
+
+
+def entry_applies(entry: RiskyEntry, agent: str, tool_id, category) -> bool:
+    kind, entry_agent, value = tool_selector(entry.tool)
+    if kind == "category":
+        return category == value
+    return entry_agent == agent and tool_id == value
+
+
+def matches(entry: RiskyEntry, tool_name: str, tool_input: dict, agent: str = "kiro", category=None) -> bool:
+    if not entry_applies(entry, agent, tool_name, category):
         return False
     condition = entry.match
     if isinstance(condition, AnyArgs):
@@ -155,11 +226,15 @@ def matches(entry: RiskyEntry, tool_name: str, tool_input: dict) -> bool:
     return False
 
 
-def decide(entries, tool_name: str, tool_input: dict):
+def decide(entries, tool_name: str, tool_input: dict, agent: str = "kiro", category=None):
     for entry in entries:
-        if matches(entry, tool_name, tool_input):
+        if matches(entry, tool_name, tool_input, agent, category):
             return entry
     return None
+
+
+def reason_for(entry: RiskyEntry) -> str:
+    return f'Risky tool call: {entry.tool} matched Risky_Tool_List entry "{entry.line}" ({entry.reason})'
 
 
 def ask_json(reason: str) -> str:
@@ -186,12 +261,15 @@ def main(stdin, stdout, stderr, list_path=None) -> int:
         stdout.write(ask_json(f"hook input could not be parsed: {exc}") + "\n")
         stderr.write(f"{NAME}: parse error: {exc}\n")
         return 0
-    entry = decide(entries, hook_input.tool_name, hook_input.tool_input)
+    try:
+        category, _mapping = classify(agent_entry(load_capabilities(), "kiro"), hook_input.tool_name)
+    except CapabilityError as exc:
+        stdout.write(ask_json(f"risky-tool-guard config problem: {exc}") + "\n")
+        stderr.write(f"{NAME}: {exc}\n")
+        return 0
+    entry = decide(entries, hook_input.tool_name, hook_input.tool_input, "kiro", category)
     if entry is not None:
-        reason = (
-            f'Risky tool call: {entry.tool} matched Risky_Tool_List entry "{entry.line}" ({entry.reason})'
-        )
-        stdout.write(ask_json(reason) + "\n")
+        stdout.write(ask_json(reason_for(entry)) + "\n")
     return 0
 
 

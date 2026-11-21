@@ -85,12 +85,12 @@ Conventions for every task:
 
 ### Phase 2: Agent-neutral core
 
-- [ ] 7. Verify other Agents' formats (research, no code)
+- [x] 7. Verify other Agents' formats (research, no code)
   - For Claude Code, Cursor, GitHub Copilot, Codex, and Gemini CLI: read the official docs, install the current version, capture one payload per hook event with a probe, and fill the Capability_Matrix rows with dated sources
   - Write ADR "Supported Agents and protection levels" from the results; drop or defer any Agent whose hooks cannot be verified
   - _Requirements: 9.1_
 
-- [ ] 8. Build the event model and Kiro Adapter
+- [x] 8. Build the event model and Kiro Adapter
   - [ ] 8.1 `harness/core/event.py`
     - Dataclasses, schema version, category and trigger enums; unit tests for validation of each field
     - _Requirements: 4.1_
@@ -111,7 +111,7 @@ Conventions for every task:
     - **Property 33: Unknown tools with command fields ask** (`test_p33_unknown_tools.py`)
     - _Requirements: 4.2, 4.4, 4.5, 4.6, 4.7_
 
-- [ ] 9. Move policy and guards into the core
+- [x] 9. Move policy and guards into the core
   - [ ] 9.1 Policy_Files to `harness/policy/`
     - Move the lists, keep generated copies at the old paths for one minor release; extend `risky-tools.conf` with `category:` and `<agent>:` tool forms
     - _Requirements: 5.1, 5.2_
@@ -127,7 +127,7 @@ Conventions for every task:
     - Run the full Template unit, property, and fixture suites against the new core; switch wrappers to the core; remove nothing yet
     - _Requirements: 6.8_
 
-- [ ] 10. Checkpoint: Phase 2
+- [x] 10. Checkpoint: Phase 2
   - Kiro behavior unchanged (all Template tests and Kiro fixtures pass); release 0.4.0
   - _Requirements: 4.1, 5.1_
 

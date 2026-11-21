@@ -8,4 +8,4 @@ if [ "$#" -ne 1 ]; then
   echo "usage: scripts/import-payloads.sh <kiro-version>" >&2
   exit 2
 fi
-exec python3 -I "$root/.kiro/hooks/scripts/lib/payload_probe.py" --import "$1"
+exec python3 -I "$root/harness/core/payload_probe.py" --import "$1"

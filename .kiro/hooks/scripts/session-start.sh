@@ -9,5 +9,5 @@ if ! command -v python3 >/dev/null 2>&1; then
   echo "Git information unavailable: python3 not found"
   exit 0
 fi
-python3 -I "$dir/lib/session_info.py" || echo "Git information unavailable: session_info.py failed"
+python3 -I "$dir/../../../harness/core/session_info.py" || echo "Git information unavailable: session_info.py failed"
 exit 0

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Combined guard entry for any Agent: harness/bin/guard <agent> <trigger>
+# Reads the native hook payload on stdin. Exit 2 blocks; "ask" is JSON on stdout.
+# Fails closed (exit 2) when python3 is missing or this script cannot be located.
+dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd) || {
+  echo "harness-guard: cannot locate harness/bin; blocking" >&2
+  exit 2
+}
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "harness-guard: python3 not found; blocking" >&2
+  exit 2
+fi
+exec python3 -I "$dir/../core/guard_cli.py" "$@"

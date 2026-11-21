@@ -6,4 +6,4 @@ if ! command -v python3 >/dev/null 2>&1; then
   echo "quality-on-save: python3 not found; skipped"
   exit 0
 fi
-exec python3 -I "$dir/lib/quality.py"
+exec python3 -I "$dir/../../../harness/core/quality.py"
