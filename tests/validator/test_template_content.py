@@ -321,9 +321,11 @@ class ExampleHooks(unittest.TestCase):
         self.assertTrue(examples, detail(".kiro/hooks/examples", "at least one example Hook_File", examples))
         for path in examples:
             data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertIn(f"`{path.name}`", section, detail(path.name, "guide names the file", "missing"))
+            entry = section.split(f"`{path.name}`", 1)[1].split("\n- ", 1)[0]
             for hook in data["hooks"]:
                 self.assertIs(hook.get("enabled"), False, detail(path.name, '"enabled": false', hook.get("enabled")))
-                self.assertIn(f"`{path.name}`, trigger `{hook['trigger']}`", section,
-                              detail(path.name, "guide names the file and its trigger", "missing"))
+                self.assertIn(f"`{hook['trigger']}`", entry,
+                              detail(path.name, f"guide entry names trigger {hook['trigger']}", entry))
         self.assertIn("To enable one:", section)
         self.assertIn("mv .kiro/hooks/examples/", section)

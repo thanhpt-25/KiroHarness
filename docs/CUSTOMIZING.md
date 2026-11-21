@@ -194,6 +194,12 @@ The examples in `.kiro/hooks/examples/` are disabled:
   test when a file is created under `src/`.
 - `pre-compact-snapshot.json`, trigger `PreCompact`: prints the branch, last
   commit, and changed files before the context is compacted.
+- `payload-probe.json`, triggers `SessionStart`, `UserPromptSubmit`,
+  `PreToolUse`, `PostToolUse`, `PostFileSave`, and `PostTaskExec`: saves each
+  payload Kiro sends, with secrets masked and machine paths replaced, to the
+  git-ignored `.harness/probe/` directory. Use it to record test fixtures for
+  your Kiro version (see [Recording Kiro payloads](#recording-kiro-payloads)).
+  It never blocks and prints nothing.
 
 To enable one:
 
@@ -367,6 +373,24 @@ job's `permissions:` block.
 - **Remove:** delete the workflow file and the matching assertions in
   `tests/validator/test_ci_workflows.py`. The local Git hooks in `.githooks/`
   stay available but can be bypassed, so keep some server-side check.
+
+## Recording Kiro payloads
+
+Hook payload fields differ between Kiro versions. To record real payloads for
+your version, enable the `payload-probe.json` example hook, use Kiro normally,
+then run `scripts/import-payloads.sh <kiro-version>`. The probe masks every
+match of a secret pattern (first 4 characters kept) and replaces your workspace
+and home paths with `/WORKSPACE` and `/HOME` before writing to the git-ignored
+`.harness/probe/`; the import step masks again before copying into
+`tests/fixtures/payloads/kiro/<kiro-version>/`.
+
+Each imported payload needs a sibling `<name>.expect.json` that pins the
+outcome per hook, for example `{"destructive-command-guard": {"exit": 2}}` or
+`{"risky-tool-guard": {"exit": 0, "decision": "ask"}}`.
+`tests/hooks/test_kiro_fixtures.py` then runs every enabled hook on every
+payload. The hand-written `reference` set stands in until real recordings
+exist. The full procedure, including the manual IDE checks and how to record
+them, is in [docs/verification/kiro/RUNBOOK.md](verification/kiro/RUNBOOK.md).
 
 ## Manual Integration Checklist
 

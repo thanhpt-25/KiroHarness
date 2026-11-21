@@ -1,0 +1,74 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "payload-probe-sessionstart",
+      "trigger": "SessionStart",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh SessionStart"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    },
+    {
+      "name": "payload-probe-userpromptsubmit",
+      "trigger": "UserPromptSubmit",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh UserPromptSubmit"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    },
+    {
+      "name": "payload-probe-pretooluse",
+      "trigger": "PreToolUse",
+      "matcher": "^.+$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh PreToolUse"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    },
+    {
+      "name": "payload-probe-posttooluse",
+      "trigger": "PostToolUse",
+      "matcher": "^.+$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh PostToolUse"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    },
+    {
+      "name": "payload-probe-postfilesave",
+      "trigger": "PostFileSave",
+      "matcher": "\\.(ts|tsx|js|jsx|py|go)$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh PostFileSave"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    },
+    {
+      "name": "payload-probe-posttaskexec",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/payload-probe.sh PostTaskExec"
+      },
+      "timeout": 5,
+      "description": "Example hook, disabled. Records the masked payload to .harness/probe/ for test fixtures.",
+      "enabled": false
+    }
+  ]
+}

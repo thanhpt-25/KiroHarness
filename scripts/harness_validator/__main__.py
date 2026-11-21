@@ -13,7 +13,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering
+from . import envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
@@ -187,6 +187,18 @@ def check_mcp_file(run: Run, config) -> None:
     run.guarded("secret scan", MCP_PATH, _secret_findings, MCP_PATH, _json_pairs(text), config.secret_patterns)
 
 
+def check_verification_records(run: Run) -> None:
+    directory = run.root / "docs/verification"
+    for path in sorted(directory.glob("*/*/*.md")) if directory.is_dir() else []:
+        rel = run.rel(path)
+        run.files.add(rel)
+        text, problem = _read_text(path)
+        if text is None:
+            run.findings.append(error(rel, "-", "VERIFY-FM", problem))
+            continue
+        run.guarded("verification record", rel, verification.check_record, rel, text)
+
+
 def check_destructive_list(run: Run) -> list:
     run.files.add(DESTRUCTIVE_LIST)
     guard = load_lib_module(run.root, "destructive_guard")
@@ -327,6 +339,7 @@ def validate(root) -> tuple:
     check_steering_files(run, patterns)
     check_hook_files(run, patterns)
     check_mcp_file(run, config)
+    check_verification_records(run)
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)
     run.guarded("placeholder scan", README, check_placeholders, run)

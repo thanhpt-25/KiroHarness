@@ -55,7 +55,7 @@ Conventions for every task:
 ### Phase 1: Kiro verification
 
 - [ ] 4. Capture real Kiro payloads
-  - [ ] 4.1 Write the probe hook
+  - [x] 4.1 Write the probe hook
     - `.kiro/hooks/examples/payload-probe.json` (disabled) and `payload-probe.sh` writing masked stdin to `.harness/probe/<trigger>/<timestamp>.json` (git-ignored)
     - Unit tests: masking of every secret pattern, path normalization, never writes outside the probe directory
     - _Requirements: 3.1, 11.4_
@@ -63,12 +63,13 @@ Conventions for every task:
     - Enable the probe, trigger each event used by the enabled hooks, copy the masked payloads to `tests/fixtures/payloads/kiro/<version>/<trigger>/`
     - Add a validator test that every enabled Hook_File trigger has at least one fixture per recorded version
     - _Requirements: 3.2_
-  - [ ] 4.3 Fixture-driven hook tests
+  - [x] 4.3 Fixture-driven hook tests
     - `tests/hooks/test_kiro_fixtures.py`: run each wrapper on each fixture and assert the Template spec outcome (block, ask, pass, message)
     - _Requirements: 3.3_
 
 - [ ] 5. Manual Kiro IDE verification
-  - [ ] 5.1 Create the Manual_Check_Record format and the first records
+  - [x] 5.1 Create the Manual_Check_Record format and the first records
+    - Done: format, validator check, template, and `docs/verification/kiro/RUNBOOK.md`. The records themselves need a human in Kiro IDE (see the runbook), so Tasks 4.2, 5.2 values, 5.3, and the Phase 1 checkpoint wait for them
     - `docs/verification/README.md` with the front matter schema; one record per check in Requirement 3.4 per Kiro version
     - _Requirements: 3.4_
   - [ ] 5.2 Publish the verified version range
