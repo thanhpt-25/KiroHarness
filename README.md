@@ -146,6 +146,8 @@ The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook c
 | `tests/integration/` | Opt-in MCP server integration tests. |
 | `.github/workflows/` | CI (`ci.yml`) and the opt-in MCP integration workflow (`integration.yml`). |
 | `docs/adr/` | Architecture decision records. |
+| `docs/verification/` | Manual_Check_Records and the Kiro IDE verification runbook. |
+| `tests/fixtures/` | Recorded and reference hook payloads for fixture tests. |
 
 ## Documentation
 

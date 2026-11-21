@@ -14,3 +14,6 @@ __pycache__/
 
 # OS files
 .DS_Store
+
+# Harness runtime data: payload probe records and decision logs
+.harness/

@@ -1,0 +1,1 @@
+{"session_id": "s-1", "hook_event_name": "PreToolUse", "cwd": "/WORKSPACE", "tool_name": "delete_file", "tool_input": {"targetFile": "src/old.py"}}
