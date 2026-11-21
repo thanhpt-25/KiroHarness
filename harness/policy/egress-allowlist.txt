@@ -1,0 +1,7 @@
+# Egress_Allowlist: hosts the agent may fetch from without asking.
+# One host per line; a host also allows its subdomains. Blank lines and lines
+# starting with # are ignored. Read by risky-tools.conf (host-not-in ... @egress-allowlist.txt).
+docs.aws.amazon.com
+kiro.dev
+pypi.org
+github.com

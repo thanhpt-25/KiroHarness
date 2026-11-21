@@ -91,7 +91,7 @@ class ValidatorMain(unittest.TestCase):
                     continue
                 for name in names:
                     with self.subTest(file=path.name, module=name):
-                        self.assertTrue(name.split(".")[0] in sys.stdlib_module_names or name.split(".")[0] == "harness_validator")
+                        self.assertTrue(name.split(".")[0] in sys.stdlib_module_names or name.split(".")[0] in ("harness_validator", "decision_log"))  # decision_log: first-party harness/core module
 
     def test_large_workspace_finishes_within_10_seconds(self):
         with TemplateCopy() as root:

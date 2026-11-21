@@ -14,6 +14,10 @@
       "sha256": "e7e219e8cbc848a779ef3953282a794a541b29ee4640a7343070c871124ccfb9",
       "sources": ["harness/kiro/hooks/prompt-secret-scan.json"]
     },
+    ".kiro/hooks/protected-path-guard.json": {
+      "sha256": "a7d7672fc14b19437774d52c2a8908f6955270e73084cf45d27259bfff8877bb",
+      "sources": ["harness/kiro/hooks/protected-path-guard.json"]
+    },
     ".kiro/hooks/quality-on-save.json": {
       "sha256": "1b44289b8b4a24f9838cab3b1b6d23c94718674f9c75548ba02c339211afc56e",
       "sources": ["harness/kiro/hooks/quality-on-save.json"]
@@ -67,7 +71,7 @@
       "sources": ["harness/guidance/testing.md"]
     },
     "docs/reference/capabilities.md": {
-      "sha256": "e8e38302c7de63e425030a3cfcc6be1d40c91b661284c494164bafd9c3caa2b1",
+      "sha256": "545e06cf294ac2d3c6310608c608dd95467f2e7b8273b2b2820da0034c9742d6",
       "sources": ["harness/capabilities.json"]
     }
   }

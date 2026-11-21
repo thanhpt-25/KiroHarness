@@ -33,6 +33,7 @@ class ClaudeNative(unittest.TestCase):
     def test_disabled_guards_narrow_or_drop_hooks(self):
         manifest = copy.deepcopy(CLAUDE)
         manifest["guards"]["risky"]["enabled"] = False
+        manifest["guards"]["protected_paths"]["enabled"] = False
         manifest["guards"]["prompt_secrets"]["enabled"] = False
         manifest["quality"]["stop_validate"] = False
         hooks = generated(manifest)[0]["hooks"]

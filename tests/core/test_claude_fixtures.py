@@ -37,7 +37,7 @@ class ClaudeFixtures(unittest.TestCase):
                         self.assertEqual(data["hookEventName"], payload.parent.name)
                     elif expect["exit"] == 0:
                         self.assertEqual(out, "")
-        self.assertGreaterEqual(count, 13)
+        self.assertGreaterEqual(count, 17)
 
 
 if __name__ == "__main__":

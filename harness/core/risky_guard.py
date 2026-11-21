@@ -44,6 +44,7 @@ class RegexArg(Match):
 class HostNotIn(Match):
     field: str
     hosts: frozenset  # lowercase; a host matches itself and its subdomains
+    source: str = ""  # name of the allowlist file the hosts came from ("" when inline)
 
 
 @dataclass(frozen=True)
@@ -63,7 +64,20 @@ class RiskyListError(Exception):
         self.detail = detail
 
 
-def _parse_match(text: str, line_no: int) -> Match:
+def _read_hosts(name: str, base_dir, line_no) -> frozenset:
+    """Hosts from an allowlist file next to the policy list (one per line, # comments)."""
+    path = Path(base_dir if base_dir is not None else DEFAULT_LIST.parent) / name
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise RiskyListError(line_no, f"host list file {path} could not be read ({exc})") from None
+    hosts = frozenset(l.strip().lower().rstrip(".") for l in lines if l.strip() and not l.strip().startswith("#"))
+    if not hosts:
+        raise RiskyListError(line_no, f"host list file {path} contains no hosts")
+    return hosts
+
+
+def _parse_match(text: str, line_no: int, base_dir=None) -> Match:
     if text == "*":
         return AnyArgs()
     kind, _, rest = text.partition(" ")
@@ -81,11 +95,13 @@ def _parse_match(text: str, line_no: int) -> Match:
         parts = rest.split()
         if len(parts) < 2:
             raise RiskyListError(line_no, "host-not-in match needs '<field> <host> [<host> ...]'")
+        if len(parts) == 2 and parts[1].startswith("@"):
+            return HostNotIn(parts[0], _read_hosts(parts[1][1:], base_dir, line_no), parts[1][1:])
         return HostNotIn(parts[0], frozenset(h.lower().rstrip(".") for h in parts[1:]))
     raise RiskyListError(line_no, f"unknown match {text!r}; use *, regex <field> <regex>, or host-not-in <field> <hosts>")
 
 
-def parse_list(text: str) -> list:
+def parse_list(text: str, base_dir=None) -> list:
     """Parse ``<tool> | <reason> | <match>`` lines. Raise RiskyListError with the line number."""
     entries = []
     for line_no, raw in enumerate(text.splitlines(), start=1):
@@ -100,7 +116,7 @@ def parse_list(text: str) -> list:
             raise RiskyListError(line_no, f"tool name {tool!r} must not contain spaces")
         if tool.startswith("category:") and tool[len("category:"):] not in CATEGORIES:
             raise RiskyListError(line_no, f"unknown category in {tool!r}; use one of {', '.join(CATEGORIES)}")
-        entries.append(RiskyEntry(tool, reason, _parse_match(match_text, line_no), line, line_no))
+        entries.append(RiskyEntry(tool, reason, _parse_match(match_text, line_no, base_dir), line, line_no))
     if not entries:
         raise RiskyListError(None, "the list contains zero entries")
     return entries
@@ -114,7 +130,7 @@ def format_entry(entry: RiskyEntry) -> str:
     elif isinstance(match, RegexArg):
         text = f"regex {match.field} {match.regex.pattern}"
     else:
-        text = f"host-not-in {match.field} " + " ".join(sorted(match.hosts))
+        text = f"host-not-in {match.field} " + (f"@{match.source}" if match.source else " ".join(sorted(match.hosts)))
     return f"{entry.tool} | {entry.reason} | {text}"
 
 
@@ -130,7 +146,7 @@ def load_list(path) -> list:
         raise RiskyListError(None, "file not found") from None
     except (OSError, UnicodeDecodeError) as exc:
         raise RiskyListError(None, f"file could not be read ({exc})") from None
-    return parse_list(text)
+    return parse_list(text, path.parent)
 
 
 _MISSING = object()

@@ -23,22 +23,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from hookio import MAX_INPUT_BYTES, workspace_root  # noqa: E402
+from masking import mask_secrets, mask_value  # noqa: E402,F401
 from prompt_scan import PatternLoadError, default_config_path, load_patterns  # noqa: E402
 
 NAME = "payload-probe"
 TRIGGER_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]{0,63}$")
 WORKSPACE_TOKEN = "/WORKSPACE"
 HOME_TOKEN = "/HOME"
-
-
-def mask_value(value: str) -> str:
-    return value[:4] + "*" * max(len(value) - 4, 0)
-
-
-def mask_secrets(text: str, patterns) -> str:
-    for _pattern_id, regex in patterns:
-        text = regex.sub(lambda m: mask_value(m.group(0)), text)
-    return text
 
 
 def normalize_paths(text: str, root: Path, home) -> str:

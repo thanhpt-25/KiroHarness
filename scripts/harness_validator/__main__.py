@@ -256,6 +256,17 @@ def check_destructive_list(run: Run) -> list:
     return []
 
 
+def check_protected_list(run: Run) -> list:
+    path = "harness/policy/protected-paths.txt"
+    run.files.add(path)
+    module = load_lib_module(run.root, "protected_paths")
+    try:
+        module.load_list(run.root / path)
+    except module.ProtectedListError as exc:
+        return [error(path, "-", "PROTECTED-LIST", f"Protected_Path_List: {exc}")]
+    return []
+
+
 def risky_guard_matchers(root: Path) -> list:
     """Return the matchers of every Hook_Definition that runs risky-tool-guard.sh."""
     matchers = []
@@ -407,6 +418,7 @@ def validate_full(root) -> tuple:
     check_verification_records(run)
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)
+    run.guarded("protected list", "harness/policy/protected-paths.txt", check_protected_list, run)
     run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
     run.guarded("generator", "harness/manifest.json", check_generator, run)
     run.guarded("placeholder scan", README, check_placeholders, run)

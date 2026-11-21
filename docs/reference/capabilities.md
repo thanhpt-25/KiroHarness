@@ -4,12 +4,12 @@
 
 Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks), **permission-only** (the Agent's own permission rules, no hook), **guidance-only** (the rule is text the Agent may ignore). `documented` means the contract was read from vendor documentation; it becomes `verified` only after a Manual_Check_Record exists under `docs/verification/`.
 
-| Agent | Status | Destructive command guard | Risky tool guard | Prompt secret scan |
-|---|---|---|---|---|
-| Claude Code | documented | enforced | enforced | enforced |
-| GitHub Copilot | unverified | guidance-only | guidance-only | guidance-only |
-| Cursor | unverified | guidance-only | guidance-only | guidance-only |
-| Kiro IDE | documented | enforced | enforced | enforced |
+| Agent | Status | Destructive command guard | Risky tool guard | Prompt secret scan | Protected-path guard |
+|---|---|---|---|---|---|
+| Claude Code | documented | enforced | enforced | enforced | enforced |
+| GitHub Copilot | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
+| Cursor | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
+| Kiro IDE | documented | enforced | enforced | enforced | partial |
 
 ## Files the Generator writes
 

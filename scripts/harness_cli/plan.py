@@ -22,13 +22,15 @@ KIRO_HOOKS = {
     "destructive-command-guard": ("guards", "destructive"),
     "risky-tool-guard": ("guards", "risky"),
     "prompt-secret-scan": ("guards", "prompt_secrets"),
+    "protected-path-guard": ("guards", "protected_paths"),
     "quality-on-save": ("quality", "on_save"),
     "post-task-tests": ("quality", "post_task"),
     "stop-validate": ("quality", "stop_validate"),
     "session-start-context": ("quality", "session_start"),
 }
-GUARD_NAMES = {"destructive": "destructive-command-guard", "risky": "risky-tool-guard", "prompt_secrets": "prompt-secret-scan"}
-PRE_TOOL_GUARDS = ("destructive", "risky")
+GUARD_NAMES = {"destructive": "destructive-command-guard", "risky": "risky-tool-guard", "prompt_secrets": "prompt-secret-scan",
+               "protected_paths": "protected-path-guard"}
+PRE_TOOL_GUARDS = ("destructive", "protected_paths", "risky")
 UNVERIFIED = ("cursor", "copilot")  # output formats not confirmed against vendor docs (ADR 0007)
 BUDGET_LINES = 300
 BUDGET_CHARS = 12000
@@ -328,7 +330,7 @@ FILES_BY_AGENT = {
     "cursor": ".cursor/rules/*.mdc (and AGENTS.md)",
     "copilot": ".github/copilot-instructions.md, .github/instructions/ (and AGENTS.md)",
 }
-GUARD_COLUMNS = (("destructive", "Destructive command guard"), ("risky", "Risky tool guard"), ("prompt_secrets", "Prompt secret scan"))
+GUARD_COLUMNS = (("destructive", "Destructive command guard"), ("risky", "Risky tool guard"), ("prompt_secrets", "Prompt secret scan"), ("protected_paths", "Protected-path guard"))
 
 
 def render_capabilities_doc(root, plan) -> None:

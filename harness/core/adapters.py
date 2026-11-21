@@ -61,6 +61,8 @@ class Adapter:
         native = hook_input.event
         if isinstance(native, str) and native in self.event_names and self.event_names[native] != trigger:
             raise DecodeError(f"{self.agent}: payload is for {native}, expected {self.entry['events'].get(trigger, trigger)}")
+        if trigger == "pre_tool" and not (isinstance(hook_input.tool_name, str) and hook_input.tool_name):
+            raise DecodeError(f"{self.agent}: the tool name is missing from the payload")
         category, mapping = classify(self.entry, hook_input.tool_name)
         tool_input = hook_input.tool_input
         paths = tuple(p for p in (_string_field(tool_input, f) for f in mapping.get("paths", [])) if p)

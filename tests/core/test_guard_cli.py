@@ -2,6 +2,7 @@
 # Validates: agent-harness-platform/R4.3, agent-harness-platform/R4.4, agent-harness-platform/R4.7, agent-harness-platform/R5.1, agent-harness-platform/R5.3, agent-harness-platform/R5.5
 
 import json
+import os
 import unittest
 
 from tests._support import ROOT, TemplateCopy, detail, run_script
@@ -13,12 +14,13 @@ from capabilities import load_capabilities  # noqa: E402
 GUARD = ROOT / "harness" / "bin" / "guard"
 
 
-def guard(agent, trigger, payload, root=None):
+def guard(agent, trigger, payload, root=None, env=None):
     import subprocess
 
     script = (root or ROOT) / "harness" / "bin" / "guard"
     data = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
-    done = subprocess.run(["sh", str(script), agent, trigger], input=data, capture_output=True, cwd=str(root or ROOT), timeout=30)
+    done = subprocess.run(["sh", str(script), agent, trigger], input=data, capture_output=True, cwd=str(root or ROOT), timeout=30,
+                          env={**os.environ, **(env or {})})
     return done.returncode, done.stdout.decode(), done.stderr.decode()
 
 

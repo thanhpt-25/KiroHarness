@@ -23,6 +23,7 @@
       "properties": {
         "destructive": {"$ref": "agent"},
         "risky": {"$ref": "agent"},
+        "protected_paths": {"$ref": "agent"},
         "prompt_secrets": {"$ref": "agent"}
       }
     },

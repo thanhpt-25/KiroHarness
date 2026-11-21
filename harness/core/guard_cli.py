@@ -10,6 +10,7 @@ result in the Agent's native format (agent-harness-platform Requirements 4.2 to
 
 from __future__ import annotations
 
+import io
 import sys
 from pathlib import Path
 
@@ -20,8 +21,26 @@ from capabilities import CapabilityError  # noqa: E402
 from event_model import TRIGGERS, combine  # noqa: E402
 from guards import guards_for, run_guards  # noqa: E402
 from hookio import workspace_root  # noqa: E402
+import decision_log  # noqa: E402
+from masking import mask_secrets  # noqa: E402
+from prompt_scan import PatternLoadError, default_config_path, load_patterns  # noqa: E402
 
 NAME = "harness-guard"
+
+
+def _masked(stdout: str, stderr: str, root):
+    """No matched secret value leaves the guard on stdout or stderr (R11.4)."""
+    patterns = _patterns(root)
+    if patterns is None:
+        return stdout, stderr  # the prompt guard already denies when patterns are unusable
+    return mask_secrets(stdout, patterns), mask_secrets(stderr, patterns)
+
+
+def _patterns(root):
+    try:
+        return load_patterns(Path(root) / "scripts" / "validator-config.json")
+    except PatternLoadError:
+        return None
 
 
 def run(agent: str, trigger: str, raw: bytes, root=None, only=None):
@@ -40,7 +59,13 @@ def run(agent: str, trigger: str, raw: bytes, root=None, only=None):
         error = str(exc)
     decisions = run_guards(trigger, event, error, root, adapter.failure, only)
     out = adapter.encode(combine(decisions), trigger)
-    return out.exit_code, out.stdout, out.stderr
+    stdout, stderr = _masked(out.stdout, out.stderr, root)
+    patterns = _patterns(root)
+    if patterns is not None:
+        warn = io.StringIO()
+        decision_log.record_decisions(root, event, decisions, patterns, warn)
+        stderr += warn.getvalue()
+    return out.exit_code, stdout, stderr
 
 
 def main(argv, stdin, stdout, stderr) -> int:

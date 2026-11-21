@@ -10,4 +10,4 @@ if ! command -v python3 >/dev/null 2>&1; then
   echo "risky-tool-guard: python3 not found" >&2
   exit 0
 fi
-exec python3 -I "$dir/../../../harness/core/risky_guard.py"
+exec "$dir/../../../harness/bin/guard" kiro pre_tool --only risky-tool-guard

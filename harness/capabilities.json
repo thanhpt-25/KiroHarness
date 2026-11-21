@@ -60,6 +60,30 @@
         "web_fetch": {
           "category": "web",
           "url": "url"
+        },
+        "fs_read": {
+          "category": "read",
+          "paths": [
+            "path"
+          ]
+        },
+        "read_file": {
+          "category": "read",
+          "paths": [
+            "path"
+          ]
+        },
+        "fs_write": {
+          "category": "write",
+          "paths": [
+            "path"
+          ]
+        },
+        "write_file": {
+          "category": "write",
+          "paths": [
+            "path"
+          ]
         }
       },
       "tool_prefix_map": {

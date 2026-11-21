@@ -24,6 +24,8 @@ def build_parser() -> argparse.ArgumentParser:
     inv = sub.add_parser("mcp-inventory", help="write or compare tool inventories of the pinned MCP servers (starts the servers; needs uvx and network)")
     inv.add_argument("--check", action="store_true", help="compare live tools with harness/mcp/*.tools.json; exit 1 on any difference")
     inv.add_argument("--server", action="append", help="limit to this server (repeatable)")
+    log = sub.add_parser("log", help="show the Decision_Log")
+    log.add_argument("--summary", action="store_true", required=True, help="count each Decision per guard and the ten most frequent matched entries")
     return parser
 
 
@@ -33,6 +35,12 @@ def main(argv, out=None, err=None) -> int:
         args = build_parser().parse_args(argv)
     except SystemExit as exc:
         return 2 if exc.code else 0
+    if args.command == "log":
+        sys.path.insert(0, os.path.join(args.root, "harness", "core"))
+        import decision_log
+
+        out.write(decision_log.summarize(decision_log.read_records(args.root)))
+        return 0
     try:
         plan = plan_mod.build_plan(args.root)
     except ManifestError as exc:

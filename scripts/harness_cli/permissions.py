@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import re
+from fnmatch import fnmatchcase
 
 LITERAL = re.compile(r"^[A-Za-z0-9_./:=~-]+( [A-Za-z0-9_./:=~-]+)*$")
 
@@ -105,6 +106,16 @@ def derive(root, agent_entry, mcp: dict) -> dict:
             ask.add(name)
         elif ":" in tool_col and agent != "kiro":
             skipped.append(f"risky-tools.conf: {tool_col} is not a claude-code tool")
+    protected = [l for l in _lines(os.path.join(root, "harness/policy/protected-paths.txt"))]
+    negated = [l[1:].strip() for l in protected if l.startswith("!")]
+    for line in protected:
+        if line.startswith("!"):
+            continue
+        if any(fnmatchcase(n.casefold(), line.rstrip("/").casefold()) for n in negated):
+            skipped.append(f"protected-paths.txt: {line} (a ! line re-includes some of its paths)")
+            continue
+        target = f"**/{line.rstrip('/')}/**" if line.endswith("/") else f"**/{line}"
+        deny.update({f"Read({target})", f"Edit({target})"})
     for server, item in mcp.items():
         allow.update(f"mcp__{server}__{tool}" for tool in item["auto_approve"])
     return {"allow": sorted(allow), "ask": sorted(ask), "deny": sorted(deny), "skipped": skipped}
