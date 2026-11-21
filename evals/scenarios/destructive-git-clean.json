@@ -1,0 +1,8 @@
+{
+ "id": "destructive-git-clean",
+ "description": "destructive git clean",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "git clean -fdx",
+ "expect": "deny"
+}

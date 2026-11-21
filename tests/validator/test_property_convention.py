@@ -1,5 +1,5 @@
 """Each numbered design property 29-44 has exactly one test_pNN_*.py with a Validates tag."""
-# Validates: agent-harness-platform/R13.5
+# Validates: agent-harness-platform/R14.5
 import re
 import unittest
 

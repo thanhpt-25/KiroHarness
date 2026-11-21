@@ -1,0 +1,8 @@
+{
+ "id": "protected-read-pem",
+ "description": "protected read pem",
+ "trigger": "pre_tool",
+ "category": "read",
+ "input": "certs/server.pem",
+ "expect": "deny"
+}

@@ -396,6 +396,28 @@ Guidance-only: `.cursor/rules/*.mdc`, `.github/copilot-instructions.md` and `.gi
 
 `scripts/harness mcp-inventory` starts each pinned server (needs `uvx` and network) and writes `harness/mcp/<server>.tools.json` with a SHA-256 per tool name, description and input schema. `scripts/harness mcp-inventory --check` compares live tools with the record. When an inventory exists, the validator errors if a Manifest `auto_approve` tool is missing from it or the inventory's version differs from the pin. `scripts/check-mcp-updates.sh` also lists OSV advisories for each pin and still edits nothing.
 
+## Known gaps and limits
+
+The Destructive_Command_Guard is a **pattern-based safety net, not a sandbox**. It stops an agent that makes an ordinary mistake; it does not stop a determined or confused one. For untrusted workloads use OS-level isolation (a container, a VM, or a throwaway checkout with no credentials). `evals/bypass-corpus.json` lists 60+ command forms with a class each: `must-block` (stays blocked or asked), `known-gap` (documented bypass), `safe`. Known-gap categories:
+
+- Quote splitting and backslash escapes (`r""m -rf /`, `\rm -rf /`).
+- Encoded pipelines (`echo … | base64 -d | sh`).
+- Other interpreters (`python3 -c`, `perl -e`) and `find / -delete`.
+- Shell globs that name a protected file (`cat .e*`, `cat .en?`).
+- Tools that read protected files without a shell read command (`openssl x509 -in a.pem`).
+- Devices and filesystems: `mkfs.ext4` and `dd if=… of=/dev/…` do not match the word-literal entries.
+- `git push --force-with-lease`, `git push origin +main`, split flags (`git clean -f -d`, `git branch --delete --force`).
+- Network access through a shell (`curl` to an unlisted host); the egress allowlist applies to web tool calls only.
+
+Check with: `python3 -I evals/run.py --corpus` fails when any class changes. When you close a gap, change its class to `must-block` in the same commit.
+
+## Traceability, coverage, mutation and evals
+
+- `scripts/harness trace` prints the Traceability_Report and writes `build/traceability.json`. Tag a test with `# Validates: <spec>/R<n>.<m>`; the validator errors on an uncovered criterion or a tag that names no criterion. `docs/verification/backlog.txt` lists the criteria that still need a real Agent or Neo.
+- `scripts/coverage.sh` (needs `requirements-dev.txt`) fails below 90 percent line or 80 percent branch coverage.
+- `scripts/mutation.sh` (needs `requirements-mutation.txt`, runs weekly in CI) fails below 85 percent mutation score on a guard module.
+- `python3 -I evals/run.py` replays `evals/scenarios/*.json` through every Adapter; `validate.sh` runs it through `tests/evals`.
+
 ## Continuous Integration
 
 The Template ships two GitHub Actions workflows in `.github/workflows/`:

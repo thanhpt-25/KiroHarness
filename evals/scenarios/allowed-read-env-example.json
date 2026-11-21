@@ -1,0 +1,8 @@
+{
+ "id": "allowed-read-env-example",
+ "description": "allowed read env example",
+ "trigger": "pre_tool",
+ "category": "read",
+ "input": ".env.example",
+ "expect": "allow"
+}

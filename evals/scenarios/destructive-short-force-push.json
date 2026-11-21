@@ -1,0 +1,8 @@
+{
+ "id": "destructive-short-force-push",
+ "description": "destructive short force push",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "git push -f origin main",
+ "expect": "deny"
+}

@@ -1,5 +1,5 @@
 # Feature: agent-harness-platform, Property 42: Traceability_Report completeness
-# Validates: agent-harness-platform/R13.5
+# Validates: agent-harness-platform/R14.1, agent-harness-platform/R14.6
 import unittest
 
 from hypothesis import given, strategies as st

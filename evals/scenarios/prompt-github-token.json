@@ -1,0 +1,8 @@
+{
+ "id": "prompt-github-token",
+ "description": "prompt github token",
+ "trigger": "prompt_submit",
+ "category": "prompt",
+ "input": "my key is github_pat_000000000000000000000000000000000000000000000000000000000000",
+ "expect": "deny"
+}

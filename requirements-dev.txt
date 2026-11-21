@@ -2,3 +2,5 @@
 # The Config_Validator and the Hook_Scripts use only the Python standard library.
 # 6.168.5 is the newest Hypothesis release that still supports Python 3.10.
 hypothesis==6.168.5
+# Coverage gate (scripts/coverage.sh). 7.10.7 supports Python 3.9 and newer.
+coverage==7.10.7

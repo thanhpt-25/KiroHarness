@@ -1,0 +1,8 @@
+{
+ "id": "protected-write-dotenv",
+ "description": "protected write dotenv",
+ "trigger": "pre_tool",
+ "category": "write",
+ "input": ".env.production",
+ "expect": "deny"
+}

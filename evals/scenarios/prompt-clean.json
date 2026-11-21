@@ -1,0 +1,8 @@
+{
+ "id": "prompt-clean",
+ "description": "prompt clean",
+ "trigger": "prompt_submit",
+ "category": "prompt",
+ "input": "Please refactor the parser",
+ "expect": "allow"
+}

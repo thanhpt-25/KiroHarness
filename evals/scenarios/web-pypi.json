@@ -1,0 +1,8 @@
+{
+ "id": "web-pypi",
+ "description": "web pypi",
+ "trigger": "pre_tool",
+ "category": "web",
+ "input": "https://pypi.org/simple/requests/",
+ "expect": "allow"
+}

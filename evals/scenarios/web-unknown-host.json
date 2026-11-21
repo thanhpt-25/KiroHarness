@@ -1,0 +1,8 @@
+{
+ "id": "web-unknown-host",
+ "description": "web unknown host",
+ "trigger": "pre_tool",
+ "category": "web",
+ "input": "https://evil.example.net/x",
+ "expect": "ask"
+}

@@ -1,0 +1,2 @@
+# Mutation testing (weekly, .github/workflows/nightly.yml). Dev-only; not needed for validate.sh.
+mutmut==2.5.1

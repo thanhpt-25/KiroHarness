@@ -1,0 +1,8 @@
+{
+ "id": "prompt-aws-key",
+ "description": "prompt aws key",
+ "trigger": "prompt_submit",
+ "category": "prompt",
+ "input": "use AKIAIOSFODNN7EXAMPLE for s3",
+ "expect": "deny"
+}

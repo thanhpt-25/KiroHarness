@@ -1,0 +1,8 @@
+{
+ "id": "protected-write-ssh",
+ "description": "protected write ssh",
+ "trigger": "pre_tool",
+ "category": "write",
+ "input": ".ssh/config",
+ "expect": "deny"
+}

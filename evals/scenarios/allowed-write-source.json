@@ -1,0 +1,8 @@
+{
+ "id": "allowed-write-source",
+ "description": "allowed write source",
+ "trigger": "pre_tool",
+ "category": "write",
+ "input": "src/app.py",
+ "expect": "allow"
+}
