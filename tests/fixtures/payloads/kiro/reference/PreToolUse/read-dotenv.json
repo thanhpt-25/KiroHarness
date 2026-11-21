@@ -1,0 +1,1 @@
+{"session_id": "s-1", "hook_event_name": "PreToolUse", "cwd": "/WORKSPACE", "tool_name": "fs_read", "tool_input": {"path": "/WORKSPACE/.env"}}

@@ -1,0 +1,8 @@
+{
+ "id": "risky-terraform-apply",
+ "description": "risky terraform apply",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "terraform apply -auto-approve",
+ "expect": "ask"
+}

@@ -17,3 +17,10 @@ __pycache__/
 
 # Harness runtime data: payload probe records and decision logs
 .harness/
+
+# Per-developer Claude Code overrides
+.claude/settings.local.json
+
+
+# Test results and traceability output
+build/

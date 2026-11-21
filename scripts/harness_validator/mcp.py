@@ -130,7 +130,8 @@ def _names_server(comment: str, server: str) -> bool:
     return re.search(r"(?<![\w-])" + re.escape(server) + r"(?![\w-])", comment) is not None
 
 
-def check_mcp(path: str, text: str, env_example, config) -> list:
+def check_mcp(path: str, text: str, env_example, config, native: bool = False) -> list:
+    """``native`` is for an Agent's own MCP file (``.mcp.json``), which has no ``disabled`` field."""
     try:
         data = json.loads(text)
     except json.JSONDecodeError as exc:
@@ -147,7 +148,9 @@ def check_mcp(path: str, text: str, env_example, config) -> list:
             continue
 
         disabled = entry.get("disabled")
-        if "disabled" not in entry:
+        if native:
+            pass
+        elif "disabled" not in entry:
             findings.append(error(path, f"{prefix}.disabled", "MCP-DISABLED", f'server "{server}": disabled field is missing; set it to true or false'))
         elif not isinstance(disabled, bool):
             findings.append(error(path, f"{prefix}.disabled", "MCP-DISABLED", f'server "{server}": disabled must be a JSON boolean, got {json.dumps(disabled)}'))

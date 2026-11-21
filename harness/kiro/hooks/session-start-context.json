@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "session-start-context",
+      "trigger": "SessionStart",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/session-start.sh"
+      },
+      "timeout": 10,
+      "description": "Adds the git branch and the uncommitted file count to the session context."
+    }
+  ]
+}

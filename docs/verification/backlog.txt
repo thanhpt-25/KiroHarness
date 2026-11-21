@@ -1,0 +1,11 @@
+# Criteria that need Neo, a real agent, or later phases. One "spec/Rn.m" per line.
+# Shrink to empty by Phase 6; the validator fails on ids listed here that are already covered.
+agent-harness-platform/R1.1
+agent-harness-platform/R1.2
+agent-harness-platform/R1.4
+agent-harness-platform/R15.5
+agent-harness-platform/R2.5
+agent-harness-platform/R2.6
+agent-harness-platform/R3.5
+agent-harness-platform/R3.6
+agent-harness-platform/R8.5

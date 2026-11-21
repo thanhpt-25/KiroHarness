@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "aws-docs": {
+      "command": "uvx",
+      "args": ["awslabs.aws-documentation-mcp-server@1.2.6"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_DOCUMENTATION_PARTITION": "aws"
+      },
+      "disabled": false,
+      "autoApprove": ["read_documentation", "search_documentation", "recommend"]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch@2026.11.18"],
+      "disabled": false,
+      "autoApprove": []
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git@2026.11.18", "--repository", "."],
+      "disabled": false,
+      "autoApprove": ["git_status", "git_diff_unstaged", "git_diff_staged", "git_diff", "git_log", "git_show", "git_branch"]
+    }
+  }
+}

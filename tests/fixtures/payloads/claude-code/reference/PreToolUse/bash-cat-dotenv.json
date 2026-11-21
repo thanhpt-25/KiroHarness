@@ -1,0 +1,1 @@
+{"session_id": "s-1", "transcript_path": "/HOME/.claude/projects/p/s-1.jsonl", "cwd": "/WORKSPACE", "permission_mode": "default", "hook_event_name": "PreToolUse", "tool_use_id": "toolu_01", "tool_name": "Bash", "tool_input": {"command": "cat .env"}}

@@ -18,14 +18,14 @@ temporary copy of the Template and must validate with zero errors.
 
 ## Steering Files
 
-Steering_Files are Markdown files in `.kiro/steering/` with YAML front matter.
+Steering_Files are Markdown files with YAML front matter. Write them in `harness/guidance/` (the Guidance_Sources); `scripts/harness sync` copies them to `.kiro/steering/` for Kiro and renders the same guidance into `AGENTS.md`, `CLAUDE.md`, Cursor and Copilot files for the Agents you enable. Do not edit `.kiro/steering/` by hand; `scripts/validate.sh` reports that as drift.
 The `inclusion` field sets when Kiro loads the file.
 
 ### Inclusion mode `always`
 
 Loaded in every session. Use it for context the agent always needs.
 
-```markdown example=steering path=.kiro/steering/team-conventions.md
+```markdown example=steering path=harness/guidance/team-conventions.md
 ---
 inclusion: always
 ---
@@ -42,7 +42,7 @@ Loaded when a file matching `fileMatchPattern` is in context. The pattern is a
 glob, or a list of globs: `**/` matches zero or more directories, `*` and `?`
 do not match `/`, and `{a,b}` matches either alternative.
 
-```markdown example=steering path=.kiro/steering/sql-style.md
+```markdown example=steering path=harness/guidance/sql-style.md
 ---
 inclusion: fileMatch
 fileMatchPattern: ["**/*.sql", "migrations/**"]
@@ -58,7 +58,7 @@ fileMatchPattern: ["**/*.sql", "migrations/**"]
 
 Loaded only when you reference it in chat with `#<file name>`.
 
-```markdown example=steering path=.kiro/steering/incident-runbook.md
+```markdown example=steering path=harness/guidance/incident-runbook.md
 ---
 inclusion: manual
 ---
@@ -74,7 +74,7 @@ inclusion: manual
 Loaded when Kiro decides the request matches `description`. `name` must be 1
 to 64 characters and `description` 1 to 200 characters.
 
-```markdown example=steering path=.kiro/steering/database-migrations.md
+```markdown example=steering path=harness/guidance/database-migrations.md
 ---
 inclusion: auto
 name: database-migrations
@@ -172,7 +172,7 @@ A command hook reads JSON on standard input. For a shell tool call on
 ```
 
 Older Kiro builds send `toolName` and `toolArgs`; the scripts in
-`.kiro/hooks/scripts/lib/hookio.py` accept both.
+`harness/core/hookio.py` accept both.
 
 ### Exit codes and permission decisions
 
@@ -232,7 +232,7 @@ script tests, which read both lists at run time and test every entry.
 
 ### Destructive_Command_List
 
-Location: `.kiro/hooks/scripts/destructive-commands.txt`. One pattern per line;
+Location: `harness/policy/destructive-commands.txt`. One pattern per line;
 a command is blocked when the pattern's words appear in order in one command
 segment, ignoring case and extra spaces. Maximum 200 patterns.
 
@@ -251,7 +251,7 @@ git clean -fd
 
 ### Risky_Tool_List
 
-Location: `.kiro/hooks/scripts/risky-tools.conf`. Each entry is
+Location: `harness/policy/risky-tools.conf`. Each entry is
 `<tool> | <reason> | <match>`, with an `# example:` comment directly above it
 that holds a `tool_input` the entry must match. `<match>` is `*`,
 `regex <field> <python-regex>`, or `host-not-in <field> <host> ...`.
@@ -331,7 +331,7 @@ scripts/check-mcp-updates.sh
 ```
 
 Review the release notes and advisories, change the version in `mcp.json`,
-update the date in `.kiro/steering/tech.md`, and run `scripts/validate.sh`.
+update the date in `harness/guidance/tech.md`, and run `scripts/validate.sh`.
 `mcp-server-git` must stay at or above the minimum version in
 `scripts/validator-config.json`.
 
@@ -349,6 +349,74 @@ To get update pull requests from Renovate, add a regex manager such as:
   ]
 }
 ```
+
+## Generated files and the Manifest
+
+`harness/manifest.json` lists the enabled Agents, the guards and quality hooks, and the MCP servers. `scripts/harness sync` renders these Generated_Files from it and from `harness/guidance/` and `harness/kiro/hooks/`:
+
+- `.kiro/steering/*.md`, `.kiro/hooks/<shipped hook>.json`, and `.kiro/settings/mcp.json` for Kiro, byte-identical to the sources (provenance is in `harness/generated.lock.json`, which stores a SHA-256 per file).
+- `AGENTS.md`, `CLAUDE.md` and `.claude/rules/`, `.cursor/rules/`, `.github/copilot-instructions.md` and `.github/instructions/` when you enable those Agents. These start with a header that names their sources.
+
+Commands:
+
+```sh
+scripts/harness sync            # write every Generated_File and the lock
+scripts/harness sync --check    # write nothing; exit 1 with a unified diff when files drifted
+scripts/harness sync --force    # overwrite files that were edited by hand
+```
+
+`scripts/validate.sh` runs the drift check. `sync` refuses to overwrite a Generated_File that was edited by hand (exit 1, the file is named) unless you pass `--force`. Disabling an Agent or a guard removes its unedited files on the next sync. Files the Generator does not list, such as your own hooks in `.kiro/hooks/`, stay yours.
+
+Cursor and Copilot output formats are not yet verified against vendor documentation, and `sync` prints a warning for them. Where an Agent cannot express an inclusion mode (for example `auto`), the Generator uses a fallback and warns.
+
+## Supported Agents
+
+The protection level of each Agent per guard is generated in [docs/reference/capabilities.md](reference/capabilities.md). Edit `harness/capabilities.json`, not that file.
+
+### Kiro IDE
+
+Protection: all three guards enforced by hooks (status `documented` until the IDE checks in `docs/verification/kiro/RUNBOOK.md` are recorded). Files: `.kiro/steering/`, the shipped `.kiro/hooks/*.json`, `.kiro/settings/mcp.json`. Verify: run `scripts/validate.sh`, then the Kiro runbook.
+
+### Claude Code
+
+Enable it with `"claude-code": {"enabled": true}` in `harness/manifest.json` and run `scripts/harness sync`. Files: `AGENTS.md`, `CLAUDE.md` (imports `AGENTS.md`), `.claude/rules/`, `.claude/settings.json`, `.mcp.json`.
+
+- Hooks run `harness/bin/guard claude-code pre_tool` for shell, file, web and MCP tools, `prompt_submit` for prompts, `harness/bin/session-start`, and `harness/bin/stop-validate` (the agent cannot finish while `scripts/validate.sh` fails; it never loops).
+- `permissions.deny` and `permissions.ask` come from the policy files in `harness/policy/`, so rules with a literal form still apply when a hook does not run. Entries with no literal form (the web host allowlist, `rm -rf *`) are listed as warnings by `sync` and stay hook-only. Permission rules are prefix matches; the hook is the stronger layer.
+- MCP servers come from the Manifest into `.mcp.json`; `autoApprove` becomes `permissions.allow` entries and disabled servers go to `disabledMcpjsonServers`.
+- Your own settings go in `.claude/settings.local.json`; `.claude/settings.json` is generated.
+- The `on_save` and `post_task` quality hooks are Kiro-specific and are not rendered.
+- Verify with `docs/verification/claude-code/RUNBOOK.md`.
+
+### Cursor and GitHub Copilot
+
+Guidance-only: `.cursor/rules/*.mdc`, `.github/copilot-instructions.md` and `.github/instructions/`. No guard is enforced for these Agents, and their output formats are unverified, so `sync` warns. Do not rely on them for safety; use Kiro or Claude Code hooks for enforcement.
+
+## MCP tool inventories
+
+`scripts/harness mcp-inventory` starts each pinned server (needs `uvx` and network) and writes `harness/mcp/<server>.tools.json` with a SHA-256 per tool name, description and input schema. `scripts/harness mcp-inventory --check` compares live tools with the record. When an inventory exists, the validator errors if a Manifest `auto_approve` tool is missing from it or the inventory's version differs from the pin. `scripts/check-mcp-updates.sh` also lists OSV advisories for each pin and still edits nothing.
+
+## Known gaps and limits
+
+The Destructive_Command_Guard is a **pattern-based safety net, not a sandbox**. It stops an agent that makes an ordinary mistake; it does not stop a determined or confused one. For untrusted workloads use OS-level isolation (a container, a VM, or a throwaway checkout with no credentials). `evals/bypass-corpus.json` lists 60+ command forms with a class each: `must-block` (stays blocked or asked), `known-gap` (documented bypass), `safe`. Known-gap categories:
+
+- Quote splitting and backslash escapes (`r""m -rf /`, `\rm -rf /`).
+- Encoded pipelines (`echo … | base64 -d | sh`).
+- Other interpreters (`python3 -c`, `perl -e`) and `find / -delete`.
+- Shell globs that name a protected file (`cat .e*`, `cat .en?`).
+- Tools that read protected files without a shell read command (`openssl x509 -in a.pem`).
+- Devices and filesystems: `mkfs.ext4` and `dd if=… of=/dev/…` do not match the word-literal entries.
+- `git push --force-with-lease`, `git push origin +main`, split flags (`git clean -f -d`, `git branch --delete --force`).
+- Network access through a shell (`curl` to an unlisted host); the egress allowlist applies to web tool calls only.
+
+Check with: `python3 -I evals/run.py --corpus` fails when any class changes. When you close a gap, change its class to `must-block` in the same commit.
+
+## Traceability, coverage, mutation and evals
+
+- `scripts/harness trace` prints the Traceability_Report and writes `build/traceability.json`. Tag a test with `# Validates: <spec>/R<n>.<m>`; the validator errors on an uncovered criterion or a tag that names no criterion. `docs/verification/backlog.txt` lists the criteria that still need a real Agent or Neo.
+- `scripts/coverage.sh` (needs `requirements-dev.txt`) fails below 90 percent line or 80 percent branch coverage.
+- `scripts/mutation.sh` (needs `requirements-mutation.txt`, runs weekly in CI) fails below 85 percent mutation score on a guard module.
+- `python3 -I evals/run.py` replays `evals/scenarios/*.json` through every Adapter; `validate.sh` runs it through `tests/evals`.
 
 ## Continuous Integration
 

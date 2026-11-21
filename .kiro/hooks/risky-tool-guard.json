@@ -10,7 +10,7 @@
         "command": "sh .kiro/hooks/scripts/risky-tool-guard.sh"
       },
       "timeout": 5,
-      "description": "Asks for confirmation before tool calls on .kiro/hooks/scripts/risky-tools.conf."
+      "description": "Asks for confirmation before tool calls on harness/policy/risky-tools.conf."
     }
   ]
 }

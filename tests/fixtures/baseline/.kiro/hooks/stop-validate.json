@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "stop-validate",
+      "trigger": "Stop",
+      "action": {
+        "type": "agent",
+        "prompt": "Before you finish, run scripts/validate.sh. Confirm that it exited with code 0. If it exited with any other code, fix the reported problems and run it again; do not finish while it fails."
+      },
+      "description": "Asks the agent to confirm that scripts/validate.sh passes before it stops."
+    }
+  ]
+}

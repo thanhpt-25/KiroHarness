@@ -1,0 +1,8 @@
+{
+ "id": "web-allowlisted-host",
+ "description": "web allowlisted host",
+ "trigger": "pre_tool",
+ "category": "web",
+ "input": "https://docs.aws.amazon.com/lambda/",
+ "expect": "allow"
+}

@@ -1,0 +1,8 @@
+{
+ "id": "allowed-read-readme",
+ "description": "allowed read readme",
+ "trigger": "pre_tool",
+ "category": "read",
+ "input": "README.md",
+ "expect": "allow"
+}

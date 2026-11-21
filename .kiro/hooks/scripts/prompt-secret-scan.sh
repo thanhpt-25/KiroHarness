@@ -9,4 +9,4 @@ if ! command -v python3 >/dev/null 2>&1; then
   echo "prompt-secret-scan: python3 not found; blocking" >&2
   exit 2
 fi
-exec python3 -I "$dir/lib/prompt_scan.py"
+exec "$dir/../../../harness/bin/guard" kiro prompt_submit --only prompt-secret-scan

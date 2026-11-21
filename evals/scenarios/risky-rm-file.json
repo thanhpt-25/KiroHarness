@@ -1,0 +1,8 @@
+{
+ "id": "risky-rm-file",
+ "description": "risky rm file",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "rm old.log",
+ "expect": "ask"
+}

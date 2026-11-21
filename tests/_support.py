@@ -13,13 +13,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = ROOT / "scripts"
 HOOK_SCRIPTS = ROOT / ".kiro" / "hooks" / "scripts"
-LIB = HOOK_SCRIPTS / "lib"
+CORE = ROOT / "harness" / "core"
+LIB = CORE  # historical name
+POLICY = ROOT / "harness" / "policy"
 
-for _path in (str(SCRIPTS), str(LIB)):
+for _path in (str(SCRIPTS), str(CORE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-_COPY_IGNORE = shutil.ignore_patterns(".git", ".venv", ".hypothesis", "__pycache__", "*.pyc", ".DS_Store")
+# Tests must not write the developer's Decision_Log; tests that check logging set the variable to 1.
+os.environ.setdefault("HARNESS_DECISION_LOG", "0")
+_COPY_IGNORE = shutil.ignore_patterns(".git", ".venv", ".hypothesis", ".harness", "__pycache__", "*.pyc", ".DS_Store")
 
 
 def detail(input_value, expected, actual) -> str:
@@ -27,13 +31,13 @@ def detail(input_value, expected, actual) -> str:
     return f"input: {input_value!r}\nexpected: {expected}\nactual: {actual}"
 
 
-def run_script(script, stdin: bytes = b"", env=None, cwd=None, timeout: float = 30):
+def run_script(script, stdin: bytes = b"", env=None, cwd=None, timeout: float = 30, args=()):
     """Run a shell script with ``sh`` and return the CompletedProcess (bytes)."""
     full_env = dict(os.environ)
     if env:
         full_env.update(env)
     return subprocess.run(
-        ["sh", str(script)],
+        ["sh", str(script), *args],
         input=stdin,
         capture_output=True,
         env=full_env,

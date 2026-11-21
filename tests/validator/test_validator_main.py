@@ -76,7 +76,22 @@ class ValidatorMain(unittest.TestCase):
                 for name in names:
                     top = name.split(".")[0]
                     with self.subTest(file=path.name, module=name):
-                        self.assertIn(top, sys.stdlib_module_names)
+                        # harness_cli is first-party and itself stdlib-only (test below)
+                        self.assertTrue(top in sys.stdlib_module_names or top == "harness_cli")
+
+    def test_generator_imports_only_the_standard_library(self):
+        for path in sorted((SCRIPTS / "harness_cli").glob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    names = [alias.name for alias in node.names]
+                elif isinstance(node, ast.ImportFrom) and node.level == 0:
+                    names = [node.module]
+                else:
+                    continue
+                for name in names:
+                    with self.subTest(file=path.name, module=name):
+                        self.assertTrue(name.split(".")[0] in sys.stdlib_module_names or name.split(".")[0] in ("harness_validator", "decision_log"))  # decision_log: first-party harness/core module
 
     def test_large_workspace_finishes_within_10_seconds(self):
         with TemplateCopy() as root:

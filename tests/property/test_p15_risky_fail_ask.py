@@ -9,10 +9,10 @@ from pathlib import Path
 from hypothesis import given, strategies as st
 
 from tests.property import _profiles  # noqa: F401
-from tests._support import HOOK_SCRIPTS, tool_call
+from tests._support import POLICY, tool_call
 import risky_guard
 
-LIST = HOOK_SCRIPTS / "risky-tools.conf"
+LIST = POLICY / "risky-tools.conf"
 
 
 def not_json(data: bytes) -> bool:

@@ -15,7 +15,7 @@ HOOKS = [
     ".kiro/hooks/destructive-command-guard.json", ".kiro/hooks/quality-on-save.json",
     ".kiro/hooks/session-start-context.json", ".kiro/hooks/stop-validate.json",
 ]
-STEERING = [".kiro/steering/product.md", ".kiro/steering/testing.md", ".kiro/steering/api-design.md"]
+STEERING = ["harness/guidance/product.md", "harness/guidance/testing.md", "harness/guidance/api-design.md"]
 MCP = ".kiro/settings/mcp.json"
 FILES = HOOKS + STEERING + [MCP]
 
@@ -67,7 +67,8 @@ class ContinueAfterParseErrors(unittest.TestCase):
                     corrupt(root, path)
                 elif action == "inject":
                     expected[path] = inject(root, path)
-            findings = errors(validate(root)[0])
+            # corrupting a Generated_File also reports DRIFT; this property is about parse errors
+            findings = [f for f in errors(validate(root)[0]) if f.rule != "DRIFT"]
         for path, action in zip(FILES, plan):
             mine = [f for f in findings if f.path == path]
             if action == "corrupt":

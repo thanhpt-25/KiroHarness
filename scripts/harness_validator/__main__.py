@@ -13,14 +13,14 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
+from . import capabilities_check, generator_checks, release_checks, spec_lint, trace_check, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
 CONFIG_PATH = "scripts/validator-config.json"
-LIB_DIR = ".kiro/hooks/scripts/lib"
-DESTRUCTIVE_LIST = ".kiro/hooks/scripts/destructive-commands.txt"
-RISKY_LIST = ".kiro/hooks/scripts/risky-tools.conf"
+LIB_DIR = "harness/core"
+DESTRUCTIVE_LIST = "harness/policy/destructive-commands.txt"
+RISKY_LIST = "harness/policy/risky-tools.conf"
 RISKY_SCRIPT = "risky-tool-guard.sh"
 README = "README.md"
 
@@ -32,6 +32,8 @@ class Run:
         self.root = root
         self.findings = []
         self.files = set()
+        self.notes = []
+        self.generated = set()
 
     def rel(self, path: Path) -> str:
         try:
@@ -93,7 +95,7 @@ def _json_pairs(text: str):
 
 
 def load_lib_module(root: Path, name: str):
-    """Load a guard module from .kiro/hooks/scripts/lib so parsing logic is shared."""
+    """Load a guard module from harness/core so parsing logic is shared."""
     lib = root / LIB_DIR
     path = lib / f"{name}.py"
     if not path.is_file():
@@ -102,7 +104,7 @@ def load_lib_module(root: Path, name: str):
     if added:
         sys.path.insert(0, str(lib))
     try:
-        for dependency in ("hookio",):
+        for dependency in ("hookio", "capabilities", "event_model"):
             sys.modules.pop(dependency, None)
         module_name = f"_harness_lib_{name}"
         spec = importlib.util.spec_from_file_location(module_name, path)
@@ -118,14 +120,15 @@ def load_lib_module(root: Path, name: str):
     finally:
         if added:
             sys.path.remove(str(lib))
-        sys.modules.pop("hookio", None)
+        for dependency in ("hookio", "capabilities", "event_model"):
+            sys.modules.pop(dependency, None)
 
 
 # --- checkers -------------------------------------------------------------
 
 
 def check_steering_files(run: Run, patterns) -> None:
-    directory = run.root / ".kiro/steering"
+    directory = run.root / "harness/guidance"
     for path in sorted(directory.glob("*.md")) if directory.is_dir() else []:
         rel = run.rel(path)
         run.files.add(rel)
@@ -187,6 +190,76 @@ def check_mcp_file(run: Run, config) -> None:
     run.guarded("secret scan", MCP_PATH, _secret_findings, MCP_PATH, _json_pairs(text), config.secret_patterns)
 
 
+def check_native_mcp_files(run: Run, config) -> None:
+    """Rendered MCP files for other Agents get the same pin, secret and scope checks (R10.1, R10.6)."""
+    path = run.root / ".mcp.json"
+    if config is None or not path.is_file():
+        return
+    run.files.add(".mcp.json")
+    text, problem = _read_text(path)
+    if text is None:
+        run.findings.append(error(".mcp.json", "-", "MCP-JSON", problem))
+        return
+    env_example = None
+    env_path = run.root / ".env.example"
+    if env_path.is_file():
+        env_text, _ = _read_text(env_path)
+        if env_text is not None:
+            env_example = envfile.parse_env_example(env_text)
+    run.guarded("mcp", ".mcp.json", mcp.check_mcp, ".mcp.json", text, env_example, config, True)
+    run.guarded("secret scan", ".mcp.json", _secret_findings, ".mcp.json", _json_pairs(text), config.secret_patterns)
+
+
+def check_inventories(run: Run) -> list:
+    """autoApprove entries must exist in the server's tool inventory when one is recorded (R10.4)."""
+    from harness_cli import mcp_inventory
+
+    return mcp_inventory.check_auto_approve(run.root)
+
+
+def check_specs(run: Run) -> None:
+    root = run.root / ".kiro" / "specs"
+    for directory in sorted(p for p in root.iterdir() if p.is_dir()) if root.is_dir() else []:
+        if not (directory / "requirements.md").is_file():
+            continue
+        files = {}
+        for name in ("requirements.md", "design.md", "tasks.md"):
+            path = directory / name
+            if path.is_file():
+                run.files.add(run.rel(path))
+                files[name], _ = _read_text(path)
+            else:
+                files[name] = None
+        run.guarded("spec linter", directory.name, spec_lint.check_spec, directory.name, files)
+
+
+def check_trace(run: Run) -> list:
+    if not (run.root / ".kiro" / "specs").is_dir():
+        return []
+    return trace_check.check(str(run.root))
+
+
+def check_release(run: Run) -> list:
+    return release_checks.check(run.root)
+
+
+def check_generator(run: Run) -> None:
+    if not (run.root / "harness/manifest.json").is_file():
+        return  # a project that does not use the Generator has no Manifest
+    findings, notes, generated = generator_checks.check_generated(run.root)
+    run.findings.extend(findings)
+    run.notes.extend(notes)
+    run.generated |= generated
+
+
+def check_capabilities(run: Run) -> None:
+    path = run.root / "harness" / "capabilities.json"
+    if not path.is_file():
+        run.findings.append(error("harness/capabilities.json", "-", "CAP-FIELD", "Capability_Matrix is missing"))
+        return
+    run.guarded("capabilities", "harness/capabilities.json", capabilities_check.check_capabilities, "harness/capabilities.json", path.read_text(encoding="utf-8"))
+
+
 def check_verification_records(run: Run) -> None:
     directory = run.root / "docs/verification"
     for path in sorted(directory.glob("*/*/*.md")) if directory.is_dir() else []:
@@ -206,6 +279,17 @@ def check_destructive_list(run: Run) -> list:
         guard.load_patterns(run.root / DESTRUCTIVE_LIST)
     except guard.ListLoadError as exc:
         return [error(DESTRUCTIVE_LIST, "-", "DESTR-LIST", f"Destructive_Command_List {exc.reason}")]
+    return []
+
+
+def check_protected_list(run: Run) -> list:
+    path = "harness/policy/protected-paths.txt"
+    run.files.add(path)
+    module = load_lib_module(run.root, "protected_paths")
+    try:
+        module.load_list(run.root / path)
+    except module.ProtectedListError as exc:
+        return [error(path, "-", "PROTECTED-LIST", f"Protected_Path_List: {exc}")]
     return []
 
 
@@ -238,6 +322,11 @@ def check_risky_list(run: Run) -> list:
         return [error(RISKY_LIST, field, "RISKY-LIST", f"Risky_Tool_List: {exc.detail}")]
     findings = []
     lines = text.splitlines()
+    caps_module = load_lib_module(run.root, "capabilities")
+    try:
+        caps = caps_module.load_capabilities(run.root)
+    except caps_module.CapabilityError as exc:
+        return [error(RISKY_LIST, "-", "RISKY-LIST", f"cannot check entries without the Capability_Matrix: {exc}")]
     for entry in entries:
         above = lines[entry.line_no - 2].strip() if entry.line_no >= 2 else ""
         match = re.match(r"^#\s*example:\s*(.*)$", above)
@@ -249,8 +338,12 @@ def check_risky_list(run: Run) -> list:
                 example = json.loads(match.group(1))
                 if not isinstance(example, dict):
                     problem = "example comment must hold a JSON object"
-                elif not guard.matches(entry, entry.tool, example):
-                    problem = "example tool_input does not match the entry"
+                else:
+                    subject = guard.example_subject(entry, caps)
+                    if subject is None:
+                        problem = "tool is not in any Agent's Tool_Map in harness/capabilities.json"
+                    elif not guard.matches(entry, subject[1], example, subject[0], subject[2]):
+                        problem = "example tool_input does not match the entry"
             except json.JSONDecodeError as exc:
                 problem = f"example comment is not valid JSON: {exc.msg}"
         if problem:
@@ -267,15 +360,16 @@ def check_risky_list(run: Run) -> list:
         except re.error:
             continue  # reported by hook_rules
     for entry in entries:
-        if not any(c.fullmatch(entry.tool) for c in compiled):
-            findings.append(
-                error(
-                    RISKY_LIST,
-                    f"line {entry.line_no}",
-                    "RISKY-COVER",
-                    f"tool {entry.tool} is not covered by the Risky_Tool_Guard matcher",
+        for tool in guard.kiro_tools(entry, caps):
+            if not any(c.fullmatch(tool) for c in compiled):
+                findings.append(
+                    error(
+                        RISKY_LIST,
+                        f"line {entry.line_no}",
+                        "RISKY-COVER",
+                        f"tool {tool} is not covered by the Risky_Tool_Guard matcher",
+                    )
                 )
-            )
     return findings
 
 
@@ -293,7 +387,7 @@ def check_placeholders(run: Run) -> list:
     for path in files:
         rel = run.rel(path)
         run.files.add(rel)
-        if rel == README:
+        if rel == README or rel in run.generated or rel.startswith("tests/fixtures/baseline/"):  # frozen snapshot of generated files
             continue
         text, _ = _read_text(path)
         if text is None:
@@ -326,6 +420,12 @@ def check_placeholders(run: Run) -> list:
 
 def validate(root) -> tuple:
     """Run every check. Return ``(findings, files_checked)``."""
+    findings, files, _notes = validate_full(root)
+    return findings, files
+
+
+def validate_full(root) -> tuple:
+    """Run every check. Return ``(findings, files_checked, notes)``."""
     root = Path(root).resolve()
     run = Run(root)
     config = None
@@ -339,11 +439,19 @@ def validate(root) -> tuple:
     check_steering_files(run, patterns)
     check_hook_files(run, patterns)
     check_mcp_file(run, config)
+    check_native_mcp_files(run, config)
+    run.guarded("mcp inventory", "harness/mcp", check_inventories, run)
     check_verification_records(run)
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)
+    run.guarded("protected list", "harness/policy/protected-paths.txt", check_protected_list, run)
+    run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
+    run.guarded("generator", "harness/manifest.json", check_generator, run)
+    check_specs(run)
+    run.guarded("release checks", "harness/VERSION", check_release, run)
+    run.guarded("traceability", "docs/verification/backlog.txt", check_trace, run)
     run.guarded("placeholder scan", README, check_placeholders, run)
-    return run.findings, len(run.files)
+    return run.findings, len(run.files), run.notes
 
 
 def main(argv=None, stdout=None) -> int:
@@ -352,8 +460,9 @@ def main(argv=None, stdout=None) -> int:
     parser.add_argument("--root", default=".", help="workspace root (default: current directory)")
     args = parser.parse_args(argv)
     try:
-        findings, files_checked = validate(args.root)
+        findings, files_checked, notes = validate_full(args.root)
         text, code = report.render(findings, files_checked)
+        text = "".join(f"{note}\n" for note in notes) + text
     except Exception:
         traceback.print_exc()
         return 2

@@ -1,0 +1,8 @@
+{
+ "id": "destructive-rm-rf-root",
+ "description": "destructive rm rf root",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "rm -rf /",
+ "expect": "deny"
+}

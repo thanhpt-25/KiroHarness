@@ -1,0 +1,8 @@
+{
+ "id": "destructive-reset-hard",
+ "description": "destructive reset hard",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "git reset --hard HEAD~3",
+ "expect": "deny"
+}

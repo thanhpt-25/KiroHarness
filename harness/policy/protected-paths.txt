@@ -1,0 +1,16 @@
+# Protected_Path_List: paths the agent must not read, write or delete.
+# One pattern per line, gitignore style: * and ? match inside one path segment;
+# a pattern without / matches the file name at any depth; a pattern with / matches
+# that segment sequence at any depth; a trailing / matches a directory and
+# everything under it; a leading ! re-includes a path an earlier line protected.
+# Matching ignores case. Shell commands that read a protected path with cat, less,
+# head, tail, cp, base64, xxd, source (and similar) are blocked too.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+.ssh/
+.aws/credentials
+.kiro/settings/mcp.local.json

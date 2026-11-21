@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "quality-on-save",
+      "trigger": "PostFileSave",
+      "matcher": "\\.(ts|tsx|js|jsx|py|go)$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/quality-on-save.sh"
+      },
+      "timeout": 120,
+      "description": "Lints the saved source file and runs it when it is a test file. The extension list is this matcher."
+    }
+  ]
+}

@@ -7,10 +7,10 @@ import unittest
 from hypothesis import assume, given, strategies as st
 
 from tests.property import _profiles  # noqa: F401
-from tests._support import HOOK_SCRIPTS
+from tests._support import POLICY
 import destructive_guard
 
-LIST = HOOK_SCRIPTS / "destructive-commands.txt"
+LIST = POLICY / "destructive-commands.txt"
 
 
 def not_json(data: bytes) -> bool:

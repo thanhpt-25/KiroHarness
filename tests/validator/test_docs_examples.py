@@ -57,7 +57,8 @@ class DocsExamples(unittest.TestCase):
                 for append_attrs, append_body in appends:
                     apply(root, append_attrs, append_body)
                 apply(root, attrs, body)
-                found = errors(validate(root)[0])
+                # The examples edit Generated_Files in place, so DRIFT is expected here; every other rule must pass.
+                found = [f for f in errors(validate(root)[0]) if f.rule != "DRIFT"]
                 self.assertEqual(found, [], detail(attrs, "0 errors", found))
 
 

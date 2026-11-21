@@ -48,7 +48,7 @@ class SecretFindings(unittest.TestCase):
         }
         (self.root / ".kiro/hooks/secret-test.json").write_text(json.dumps(hook))
         steering = "---\ninclusion: manual\n---\n\n" + "\n".join(["ref " + r for r in refs] + ["value " + v for v in values]) + "\n"
-        (self.root / ".kiro/steering/secret-test.md").write_text(steering)
+        (self.root / "harness/guidance/secret-test.md").write_text(steering)
         findings = [f for f in validate(self.root)[0] if f.rule == "SECRET"]
 
         hook_fields = {f.field for f in findings if f.path.endswith("secret-test.json")}

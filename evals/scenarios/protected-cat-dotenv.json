@@ -1,0 +1,8 @@
+{
+ "id": "protected-cat-dotenv",
+ "description": "protected cat dotenv",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "cat .env",
+ "expect": "deny"
+}

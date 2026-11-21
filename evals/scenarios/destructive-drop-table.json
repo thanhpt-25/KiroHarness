@@ -1,0 +1,8 @@
+{
+ "id": "destructive-drop-table",
+ "description": "destructive drop table",
+ "trigger": "pre_tool",
+ "category": "shell",
+ "input": "psql -c 'DROP TABLE users'",
+ "expect": "deny"
+}

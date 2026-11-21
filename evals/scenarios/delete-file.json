@@ -1,0 +1,8 @@
+{
+ "id": "delete-file",
+ "description": "delete file",
+ "trigger": "pre_tool",
+ "category": "delete",
+ "input": "old/notes.txt",
+ "expect": "ask"
+}
