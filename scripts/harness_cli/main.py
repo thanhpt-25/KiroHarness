@@ -50,7 +50,8 @@ def main(argv, out=None, err=None) -> int:
             json.dump(report, handle, indent=2, sort_keys=True)
             handle.write("\n")
         out.write(json.dumps(report, indent=2, sort_keys=True) + "\n" if args.json else trace_check.markdown(report))
-        return 1 if report["uncovered"] or report["dangling"] else 0
+        errors = [f for f in trace_check.check(args.root) if f.severity.value == "error"]
+        return 1 if errors else 0
     if args.command == "new-spec":
         from . import specs
 

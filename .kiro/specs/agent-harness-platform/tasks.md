@@ -223,74 +223,74 @@ Conventions for every task:
 
 ### Phase 5: Security, observability, and quality gates
 
-- [ ] 18. Protected paths and egress
-  - [ ] 18.1 Protected-path guard
+- [x] 18. Protected paths and egress
+  - [x] 18.1 Protected-path guard
     - `harness/policy/protected-paths.txt` with defaults and `!` re-includes; guard for read, write, delete, and shell read commands; fail closed on a missing list
     - **Property 38: Protected-path decisions** (`test_p38_protected_paths.py`)
     - _Requirements: 11.1, 11.2, 11.5_
-  - [ ] 18.2 Egress allowlist
+  - [x] 18.2 Egress allowlist
     - `egress-allowlist.txt`; risky guard asks for any `web` category call to an unlisted host, for every Adapter
     - _Requirements: 11.3_
-  - [ ] 18.3 Secret non-disclosure
+  - [x] 18.3 Secret non-disclosure
     - **Property 39: No secret reaches any output channel** (`test_p39_no_secret_leak.py`) over stdout, stderr, Decision_Log, fixtures, and reports
     - _Requirements: 11.4_
 
-- [ ] 19. Decision_Log
-  - [ ] 19.1 Logger
+- [x] 19. Decision_Log
+  - [x] 19.1 Logger
     - Append-only JSON Lines, masking, truncation, rotation at 5 MB with 3 files, `HARNESS_DECISION_LOG=0` opt-out, `.gitignore` entry
     - _Requirements: 12.1, 12.2, 12.4_
-  - [ ] 19.2 Failure isolation
+  - [x] 19.2 Failure isolation
     - **Property 40: Decision_Log failures never change the Decision** (`test_p40_log_failure.py`)
     - _Requirements: 12.3_
-  - [ ] 19.3 `harness log --summary`
+  - [x] 19.3 `harness log --summary`
     - Counts per guard and top ten matched entries; unit tests over a fixture log
     - _Requirements: 12.5_
 
-- [ ] 20. Spec_Linter and spec scaffolding
-  - [ ] 20.1 Structure and EARS checks
+- [x] 20. Spec_Linter and spec scaffolding
+  - [x] 20.1 Structure and EARS checks
     - `harness_validator/spec_lint.py` for every spec directory
     - **Property 43: EARS classification** (`test_p43_ears.py`)
     - _Requirements: 13.1, 13.2, 13.3_
-  - [ ] 20.2 Task reference checks
+  - [x] 20.2 Task reference checks
     - **Property 41: Spec_Linter task references** (`test_p41_task_refs.py`); run the linter on this spec and the Template spec and fix findings
     - _Requirements: 13.4_
-  - [ ] 20.3 `harness new-spec`
+  - [x] 20.3 `harness new-spec`
     - Skeleton that passes the linter; refuses an existing directory; Kiro `.config.kiro` included
     - _Requirements: 13.5_
-  - [ ] 20.4 Spec workflow guidance
+  - [x] 20.4 Spec workflow guidance
     - Manual Guidance_Source "spec-workflow" rendered for Agents without a spec mode
     - _Requirements: 13.6_
 
-- [ ] 21. Traceability and coverage gates
+- [x] 21. Traceability and coverage gates
   - Runs after the Spec_Linter task because it reuses its requirement and task parsers
-  - [ ] 21.1 `harness trace`
+  - [x] 21.1 `harness trace`
     - Parse criteria, task references, Validates_Tags, Manual_Check_Records, last test results; print Markdown and write `build/traceability.json`; list skipped tests with reasons
     - **Property 42: Traceability completeness** (`test_p42_traceability.py`)
     - _Requirements: 14.1, 14.6_
-  - [ ] 21.2 Trace check in the validator
+  - [x] 21.2 Trace check in the validator
     - Uncovered criteria and dangling tags are errors for this spec and the Template spec; close the backlog from Task 2.3
     - _Requirements: 14.2_
-  - [ ] 21.3 Coverage gate
+  - [x] 21.3 Coverage gate
     - Pin a coverage tool in `requirements-dev.txt`; CI fails under 90 percent line or 80 percent branch per package
     - _Requirements: 14.3_
-  - [ ] 21.4 Mutation testing
+  - [x] 21.4 Mutation testing
     - Pin a mutation tool; `nightly.yml` runs it on guard modules; fail under 85 percent with surviving mutants listed; add tests until the threshold holds
     - _Requirements: 14.4_
-  - [ ] 21.5 Property test conventions
+  - [x] 21.5 Property test conventions
     - Validator test that each of Properties 29 to 44 has exactly one module with the matching number and tag
     - _Requirements: 14.5_
 
-- [ ] 22. Evals
-  - [ ] 22.1 Scenario runner
+- [x] 22. Evals
+  - [x] 22.1 Scenario runner
     - `evals/scenarios/*.json` (at least 20), runner that renders native payloads per Adapter and runs the real wrappers; wired into `scripts/validate.sh`
     - _Requirements: 15.1_
-  - [ ] 22.2 Bypass_Corpus
+  - [x] 22.2 Bypass_Corpus
     - At least 50 labeled items; runner fails on an allowed `must-block`; report `known-gap` counts; improve the destructive patterns where cheap and safe
     - _Requirements: 15.2, 15.3_
-  - [ ] 22.3 Limits documentation
+  - [x] 22.3 Limits documentation
     - Customization_Guide section on known gaps and sandbox recommendation; README shows corpus results
     - _Requirements: 15.4_
-  - [ ] 22.4 Live evals
+  - [x] 22.4 Live evals
     - Opt-in drivers per Agent CLI in a temporary Template copy; results saved as Manual_Check_Records; excluded from PR CI
     - _Requirements: 15.5_
 

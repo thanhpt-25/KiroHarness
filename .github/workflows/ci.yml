@@ -39,3 +39,6 @@ jobs:
           HARNESS_OFFLINE: "1"
           HYPOTHESIS_PROFILE: ci
         run: sh scripts/test-properties.sh
+      - name: Coverage gate (90 percent line, 80 percent branch)
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.x'
+        run: sh scripts/coverage.sh

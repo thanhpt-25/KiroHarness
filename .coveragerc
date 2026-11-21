@@ -4,12 +4,13 @@ branch = True
 parallel = True
 patch = subprocess
 data_file = build/.coverage
-source =
-    scripts/harness_validator
-    scripts/harness_cli
-    harness/core
+include =
+    */scripts/harness_validator/*
+    */scripts/harness_cli/*
+    */harness/core/*
 omit =
     */__main__.py
+    */tests/*
 
 [paths]
 # Tests copy the template to a temp directory and run hooks there; map those paths back.
