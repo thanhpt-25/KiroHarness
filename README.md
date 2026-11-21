@@ -49,7 +49,7 @@ The Git hook installer sets the local Git option core.hooksPath=.githooks. It do
 
 ## How the harness fits together
 
-~~~mermaid
+```mermaid
 flowchart TB
   K[Kiro IDE] --> S[Steering files]
   K --> J[Hook JSON definitions]
@@ -60,7 +60,7 @@ flowchart TB
   V[scripts/validate.sh] --> CV[Config validator]
   V --> UT[Hook and validator unit tests]
   PP[Optional pre-push] --> PT[Hypothesis property suite]
-~~~
+```
 
 Kiro reads steering and hook configuration from .kiro/. Command hooks receive event JSON on standard input. Small shell wrappers invoke Python modules in isolated mode. Policy and quality settings remain in separate text configuration files, so projects can tune them without changing the hook runtime.
 
