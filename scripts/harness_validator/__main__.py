@@ -13,7 +13,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import capabilities_check, generator_checks, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
+from . import capabilities_check, generator_checks, spec_lint, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
@@ -215,6 +215,22 @@ def check_inventories(run: Run) -> list:
     from harness_cli import mcp_inventory
 
     return mcp_inventory.check_auto_approve(run.root)
+
+
+def check_specs(run: Run) -> None:
+    root = run.root / ".kiro" / "specs"
+    for directory in sorted(p for p in root.iterdir() if p.is_dir()) if root.is_dir() else []:
+        if not (directory / "requirements.md").is_file():
+            continue
+        files = {}
+        for name in ("requirements.md", "design.md", "tasks.md"):
+            path = directory / name
+            if path.is_file():
+                run.files.add(run.rel(path))
+                files[name], _ = _read_text(path)
+            else:
+                files[name] = None
+        run.guarded("spec linter", directory.name, spec_lint.check_spec, directory.name, files)
 
 
 def check_generator(run: Run) -> None:
@@ -421,6 +437,7 @@ def validate_full(root) -> tuple:
     run.guarded("protected list", "harness/policy/protected-paths.txt", check_protected_list, run)
     run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
     run.guarded("generator", "harness/manifest.json", check_generator, run)
+    check_specs(run)
     run.guarded("placeholder scan", README, check_placeholders, run)
     return run.findings, len(run.files), run.notes
 

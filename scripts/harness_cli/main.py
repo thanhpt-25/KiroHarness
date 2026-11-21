@@ -26,6 +26,8 @@ def build_parser() -> argparse.ArgumentParser:
     inv.add_argument("--server", action="append", help="limit to this server (repeatable)")
     log = sub.add_parser("log", help="show the Decision_Log")
     log.add_argument("--summary", action="store_true", required=True, help="count each Decision per guard and the ten most frequent matched entries")
+    new = sub.add_parser("new-spec", help="create .kiro/specs/<name>/ with a skeleton that passes the Spec_Linter")
+    new.add_argument("name", help="spec name: lowercase letters, digits and hyphens")
     return parser
 
 
@@ -35,6 +37,12 @@ def main(argv, out=None, err=None) -> int:
         args = build_parser().parse_args(argv)
     except SystemExit as exc:
         return 2 if exc.code else 0
+    if args.command == "new-spec":
+        from . import specs
+
+        code, message = specs.create(args.root, args.name)
+        (out if code == 0 else err).write(message + "\n")
+        return code
     if args.command == "log":
         sys.path.insert(0, os.path.join(args.root, "harness", "core"))
         import decision_log

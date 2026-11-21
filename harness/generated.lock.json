@@ -58,6 +58,10 @@
       "sha256": "786bc2771e3853e157be0c715a94723630fbc56c1ae0bbd1bc3d466dd82ae9ef",
       "sources": ["harness/guidance/security.md"]
     },
+    ".kiro/steering/spec-workflow.md": {
+      "sha256": "ad118c417b2ed50ac36191d165132d8d4bd25b6933018ccbc3129345fec1c27f",
+      "sources": ["harness/guidance/spec-workflow.md"]
+    },
     ".kiro/steering/structure.md": {
       "sha256": "e581fbd7b1503f27cd0b833fbe68dc7a73247d0eb10f745ec91a31a38fa70f01",
       "sources": ["harness/guidance/structure.md"]
