@@ -280,7 +280,7 @@ Conventions for every task:
     - Validator test that each of Properties 29 to 44 has exactly one module with the matching number and tag
     - _Requirements: 14.5_
 
-- [x] 22. Evals
+- [ ] 22. Evals
   - [x] 22.1 Scenario runner
     - `evals/scenarios/*.json` (at least 20), runner that renders native payloads per Adapter and runs the real wrappers; wired into `scripts/validate.sh`
     - _Requirements: 15.1_
@@ -290,7 +290,7 @@ Conventions for every task:
   - [x] 22.3 Limits documentation
     - Customization_Guide section on known gaps and sandbox recommendation; README shows corpus results
     - _Requirements: 15.4_
-  - [x] 22.4 Live evals
+  - [ ] 22.4 Live evals
     - Opt-in drivers per Agent CLI in a temporary Template copy; results saved as Manual_Check_Records; excluded from PR CI
     - _Requirements: 15.5_
 
