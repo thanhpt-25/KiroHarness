@@ -1,5 +1,6 @@
 """Smoke tests for the shipped Template content (Requirements 1, 2, 4.1, 5.1,
 6.1, 6.5, 7.4, 8.1, 8.2, 8.7, 12, 13)."""
+# Validates: kiro-agent-harness-template/R1.1, kiro-agent-harness-template/R1.2, kiro-agent-harness-template/R1.3, kiro-agent-harness-template/R1.4, kiro-agent-harness-template/R1.5, kiro-agent-harness-template/R2.1, kiro-agent-harness-template/R2.2, kiro-agent-harness-template/R2.3, kiro-agent-harness-template/R2.4, kiro-agent-harness-template/R2.5, kiro-agent-harness-template/R2.8, kiro-agent-harness-template/R4.1, kiro-agent-harness-template/R5.1, kiro-agent-harness-template/R6.1, kiro-agent-harness-template/R6.5, kiro-agent-harness-template/R7.4, kiro-agent-harness-template/R8.1, kiro-agent-harness-template/R8.2, kiro-agent-harness-template/R8.7, kiro-agent-harness-template/R12.1, kiro-agent-harness-template/R12.2, kiro-agent-harness-template/R12.3, kiro-agent-harness-template/R12.4, kiro-agent-harness-template/R12.5, kiro-agent-harness-template/R12.6, kiro-agent-harness-template/R13.1, kiro-agent-harness-template/R13.2, kiro-agent-harness-template/R13.3, kiro-agent-harness-template/R13.4, kiro-agent-harness-template/R13.5, kiro-agent-harness-template/R13.6, kiro-agent-harness-template/R13.7, kiro-agent-harness-template/R13.8, kiro-agent-harness-template/R13.10
 
 import json
 import os
@@ -309,3 +310,20 @@ class Documentation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExampleHooks(unittest.TestCase):
+    # Validates: kiro-agent-harness-template/R7.5
+    def test_example_hooks_are_disabled_and_documented(self):
+        guide = (ROOT / "docs/CUSTOMIZING.md").read_text(encoding="utf-8")
+        section = guide.split("### Enabling the example hooks", 1)[1].split("\n### ", 1)[0]
+        examples = sorted((ROOT / ".kiro/hooks/examples").glob("*.json"))
+        self.assertTrue(examples, detail(".kiro/hooks/examples", "at least one example Hook_File", examples))
+        for path in examples:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for hook in data["hooks"]:
+                self.assertIs(hook.get("enabled"), False, detail(path.name, '"enabled": false', hook.get("enabled")))
+                self.assertIn(f"`{path.name}`, trigger `{hook['trigger']}`", section,
+                              detail(path.name, "guide names the file and its trigger", "missing"))
+        self.assertIn("To enable one:", section)
+        self.assertIn("mv .kiro/hooks/examples/", section)

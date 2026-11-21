@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 4: Parser schema acceptance and complete violation listing
+# Validates: kiro-agent-harness-template/R9.2, kiro-agent-harness-template/R9.4
 import copy
 import json
 import unittest

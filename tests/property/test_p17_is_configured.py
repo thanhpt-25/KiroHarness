@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 17: Command configuration predicate
+# Validates: kiro-agent-harness-template/R6.4
 import re
 import unittest
 

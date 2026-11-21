@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 25: Secret findings are masked and Secret_References are ignored
+# Validates: kiro-agent-harness-template/R10.6
 import json
 import unittest
 

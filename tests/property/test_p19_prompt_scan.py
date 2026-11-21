@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 19: Prompt secret scan blocks exactly the prompts with secrets
+# Validates: kiro-agent-harness-template/R7.2, kiro-agent-harness-template/R7.7
 import io
 import json
 import unittest

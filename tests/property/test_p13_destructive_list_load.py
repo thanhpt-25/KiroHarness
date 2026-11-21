@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 13: Destructive list loading
+# Validates: kiro-agent-harness-template/R4.5, kiro-agent-harness-template/R4.8
 import tempfile
 import unittest
 from pathlib import Path

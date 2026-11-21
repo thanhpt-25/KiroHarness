@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 27: Placeholder extraction matches the placeholder format
+# Validates: kiro-agent-harness-template/R2.7
 import unittest
 
 from hypothesis import given, strategies as st

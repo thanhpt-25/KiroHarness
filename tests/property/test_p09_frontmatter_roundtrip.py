@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 9: Front matter round trip for the supported YAML subset
+# Validates: kiro-agent-harness-template/R10.12
 import unittest
 
 from hypothesis import given, strategies as st

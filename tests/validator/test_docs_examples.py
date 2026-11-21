@@ -6,6 +6,7 @@ to the MCP_Config; ``merge=append`` appends to the file. Every ``merge=append``
 block is applied to each copy, because the MCP example needs its
 ``.env.example`` lines.
 """
+# Validates: kiro-agent-harness-template/R13.11
 
 import json
 import re

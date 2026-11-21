@@ -3,6 +3,8 @@
 Test cases for the blocked commands are built from destructive-commands.txt at
 run time, so a new entry is tested without changing this file.
 """
+# Validates: kiro-agent-harness-template/R4.4, kiro-agent-harness-template/R4.7, kiro-agent-harness-template/R4.8, kiro-agent-harness-template/R11.1, kiro-agent-harness-template/R11.2, kiro-agent-harness-template/R11.8
+# Validates: kiro-agent-harness-template/R4.4, kiro-agent-harness-template/R4.7, kiro-agent-harness-template/R4.8, kiro-agent-harness-template/R11.1, kiro-agent-harness-template/R11.2, kiro-agent-harness-template/R11.8
 
 import shutil
 import tempfile

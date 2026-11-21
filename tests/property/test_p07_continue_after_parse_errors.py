@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 7: Validation reports all files and continues past parse failures
+# Validates: kiro-agent-harness-template/R3.9, kiro-agent-harness-template/R10.1, kiro-agent-harness-template/R10.12
 import json
 import shutil
 import tempfile

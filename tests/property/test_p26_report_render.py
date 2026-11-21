@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 26: Report rendering and exit code
+# Validates: kiro-agent-harness-template/R10.9, kiro-agent-harness-template/R10.10
 import unittest
 
 from hypothesis import given, strategies as st

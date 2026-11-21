@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 22: autoApprove classification
+# Validates: kiro-agent-harness-template/R8.5, kiro-agent-harness-template/R10.8
 import re
 import unittest
 

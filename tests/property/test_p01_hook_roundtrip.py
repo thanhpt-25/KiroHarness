@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 1: Hook configuration round trip
+# Validates: kiro-agent-harness-template/R9.1, kiro-agent-harness-template/R9.8
 import unittest
 
 from hypothesis import given

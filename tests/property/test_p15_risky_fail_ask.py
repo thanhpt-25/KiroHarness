@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 15: Risky guard asks when input or configuration is unusable
+# Validates: kiro-agent-harness-template/R5.6, kiro-agent-harness-template/R5.7, kiro-agent-harness-template/R11.8
 import io
 import json
 import tempfile

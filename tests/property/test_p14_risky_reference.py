@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 14: Risky guard agrees with the reference decision
+# Validates: kiro-agent-harness-template/R5.2, kiro-agent-harness-template/R5.3, kiro-agent-harness-template/R5.5
 import io
 import json
 import re

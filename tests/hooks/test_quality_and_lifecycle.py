@@ -4,6 +4,7 @@
 Each test runs the scripts in a temporary copy of the Template with stub lint
 and test commands written to scripts/project-commands.env.
 """
+# Validates: kiro-agent-harness-template/R6.4, kiro-agent-harness-template/R6.6, kiro-agent-harness-template/R6.7, kiro-agent-harness-template/R6.8, kiro-agent-harness-template/R7.1, kiro-agent-harness-template/R7.3, kiro-agent-harness-template/R7.6, kiro-agent-harness-template/R7.8
 
 import io
 import json

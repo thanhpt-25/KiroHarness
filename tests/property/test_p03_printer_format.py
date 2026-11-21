@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 3: Hook printer output format and key order
+# Validates: kiro-agent-harness-template/R9.6, kiro-agent-harness-template/R9.7
 import json
 import unittest
 
