@@ -138,7 +138,8 @@ class Steering(unittest.TestCase):
     def test_security_rules_have_their_own_headings(self):
         headings = re.findall(r"^## (.+)$", (STEERING / "security.md").read_text(), re.M)
         self.assertEqual(headings, ["Least Privilege", "Secrets Through Environment Variables",
-                                    "Input Validation at Trust Boundaries", "Confirm Before Destructive Actions"])
+                                    "Input Validation at Trust Boundaries", "Confirm Before Destructive Actions",
+                                    "Untrusted Tool Output"])
 
 
 class Hooks(unittest.TestCase):

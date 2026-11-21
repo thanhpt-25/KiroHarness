@@ -18,14 +18,14 @@ temporary copy of the Template and must validate with zero errors.
 
 ## Steering Files
 
-Steering_Files are Markdown files in `.kiro/steering/` with YAML front matter.
+Steering_Files are Markdown files with YAML front matter. Write them in `harness/guidance/` (the Guidance_Sources); `scripts/harness sync` copies them to `.kiro/steering/` for Kiro and renders the same guidance into `AGENTS.md`, `CLAUDE.md`, Cursor and Copilot files for the Agents you enable. Do not edit `.kiro/steering/` by hand; `scripts/validate.sh` reports that as drift.
 The `inclusion` field sets when Kiro loads the file.
 
 ### Inclusion mode `always`
 
 Loaded in every session. Use it for context the agent always needs.
 
-```markdown example=steering path=.kiro/steering/team-conventions.md
+```markdown example=steering path=harness/guidance/team-conventions.md
 ---
 inclusion: always
 ---
@@ -42,7 +42,7 @@ Loaded when a file matching `fileMatchPattern` is in context. The pattern is a
 glob, or a list of globs: `**/` matches zero or more directories, `*` and `?`
 do not match `/`, and `{a,b}` matches either alternative.
 
-```markdown example=steering path=.kiro/steering/sql-style.md
+```markdown example=steering path=harness/guidance/sql-style.md
 ---
 inclusion: fileMatch
 fileMatchPattern: ["**/*.sql", "migrations/**"]
@@ -58,7 +58,7 @@ fileMatchPattern: ["**/*.sql", "migrations/**"]
 
 Loaded only when you reference it in chat with `#<file name>`.
 
-```markdown example=steering path=.kiro/steering/incident-runbook.md
+```markdown example=steering path=harness/guidance/incident-runbook.md
 ---
 inclusion: manual
 ---
@@ -74,7 +74,7 @@ inclusion: manual
 Loaded when Kiro decides the request matches `description`. `name` must be 1
 to 64 characters and `description` 1 to 200 characters.
 
-```markdown example=steering path=.kiro/steering/database-migrations.md
+```markdown example=steering path=harness/guidance/database-migrations.md
 ---
 inclusion: auto
 name: database-migrations
@@ -331,7 +331,7 @@ scripts/check-mcp-updates.sh
 ```
 
 Review the release notes and advisories, change the version in `mcp.json`,
-update the date in `.kiro/steering/tech.md`, and run `scripts/validate.sh`.
+update the date in `harness/guidance/tech.md`, and run `scripts/validate.sh`.
 `mcp-server-git` must stay at or above the minimum version in
 `scripts/validator-config.json`.
 
@@ -349,6 +349,25 @@ To get update pull requests from Renovate, add a regex manager such as:
   ]
 }
 ```
+
+## Generated files and the Manifest
+
+`harness/manifest.json` lists the enabled Agents, the guards and quality hooks, and the MCP servers. `scripts/harness sync` renders these Generated_Files from it and from `harness/guidance/` and `harness/kiro/hooks/`:
+
+- `.kiro/steering/*.md`, `.kiro/hooks/<shipped hook>.json`, and `.kiro/settings/mcp.json` for Kiro, byte-identical to the sources (provenance is in `harness/generated.lock.json`, which stores a SHA-256 per file).
+- `AGENTS.md`, `CLAUDE.md` and `.claude/rules/`, `.cursor/rules/`, `.github/copilot-instructions.md` and `.github/instructions/` when you enable those Agents. These start with a header that names their sources.
+
+Commands:
+
+```sh
+scripts/harness sync            # write every Generated_File and the lock
+scripts/harness sync --check    # write nothing; exit 1 with a unified diff when files drifted
+scripts/harness sync --force    # overwrite files that were edited by hand
+```
+
+`scripts/validate.sh` runs the drift check. `sync` refuses to overwrite a Generated_File that was edited by hand (exit 1, the file is named) unless you pass `--force`. Disabling an Agent or a guard removes its unedited files on the next sync. Files the Generator does not list, such as your own hooks in `.kiro/hooks/`, stay yours.
+
+Cursor and Copilot output formats are not yet verified against vendor documentation, and `sync` prints a warning for them. Where an Agent cannot express an inclusion mode (for example `auto`), the Generator uses a fallback and warns.
 
 ## Continuous Integration
 

@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "harness_version": "0.5.0",
+  "files": {
+    ".kiro/hooks/destructive-command-guard.json": {
+      "sha256": "3e86d3266359b993a76c8eb6d146acf339ea19d9ac227a4735ef4d8295ea8954",
+      "sources": ["harness/kiro/hooks/destructive-command-guard.json"]
+    },
+    ".kiro/hooks/post-task-tests.json": {
+      "sha256": "60e00cd173a1e34d1e2e9a657ec2eaba622e10be9bb99b3c0f7ec000dee69a8f",
+      "sources": ["harness/kiro/hooks/post-task-tests.json"]
+    },
+    ".kiro/hooks/prompt-secret-scan.json": {
+      "sha256": "e7e219e8cbc848a779ef3953282a794a541b29ee4640a7343070c871124ccfb9",
+      "sources": ["harness/kiro/hooks/prompt-secret-scan.json"]
+    },
+    ".kiro/hooks/quality-on-save.json": {
+      "sha256": "1b44289b8b4a24f9838cab3b1b6d23c94718674f9c75548ba02c339211afc56e",
+      "sources": ["harness/kiro/hooks/quality-on-save.json"]
+    },
+    ".kiro/hooks/risky-tool-guard.json": {
+      "sha256": "82bdfb34b9082fa7b0b2e06fc97713f9fdc08b28ffd57a9bff0c1812b71e6f35",
+      "sources": ["harness/kiro/hooks/risky-tool-guard.json"]
+    },
+    ".kiro/hooks/session-start-context.json": {
+      "sha256": "9073304f4543435cae255d57f73f3bb222f494471e129aa07206bacafb9002df",
+      "sources": ["harness/kiro/hooks/session-start-context.json"]
+    },
+    ".kiro/hooks/stop-validate.json": {
+      "sha256": "e26086247055ca0f7a45a5989e5958b99b8db50217042d2ad234e9f44da1b559",
+      "sources": ["harness/kiro/hooks/stop-validate.json"]
+    },
+    ".kiro/settings/mcp.json": {
+      "sha256": "507c0ae519c4fb20a722aa92ce91cc460621dd8b36ae6979ef12236111ba102a",
+      "sources": ["harness/manifest.json"]
+    },
+    ".kiro/steering/api-design.md": {
+      "sha256": "fe5a2920d7b6eb971d82081463f5acab928a424c2c0d871f794a9bd498fe4878",
+      "sources": ["harness/guidance/api-design.md"]
+    },
+    ".kiro/steering/coding-standards.md": {
+      "sha256": "85d5ae4072d9eedd6d70733bacb25a8e619edde7bc2801f50ad271158ef11d37",
+      "sources": ["harness/guidance/coding-standards.md"]
+    },
+    ".kiro/steering/product.md": {
+      "sha256": "72ad87855ea767af3cac994c2c4f8df15e09a93430d0ea2c445e75091ecea88b",
+      "sources": ["harness/guidance/product.md"]
+    },
+    ".kiro/steering/release-checklist.md": {
+      "sha256": "4801ef1784381b603aca7be2452f3736b48574d6003aa8759005901ffc3599c2",
+      "sources": ["harness/guidance/release-checklist.md"]
+    },
+    ".kiro/steering/security.md": {
+      "sha256": "786bc2771e3853e157be0c715a94723630fbc56c1ae0bbd1bc3d466dd82ae9ef",
+      "sources": ["harness/guidance/security.md"]
+    },
+    ".kiro/steering/structure.md": {
+      "sha256": "e581fbd7b1503f27cd0b833fbe68dc7a73247d0eb10f745ec91a31a38fa70f01",
+      "sources": ["harness/guidance/structure.md"]
+    },
+    ".kiro/steering/tech.md": {
+      "sha256": "3e1e3730ae997c0ac548381b617c461d175e0ff92f860bbf16bb665795c4fec9",
+      "sources": ["harness/guidance/tech.md"]
+    },
+    ".kiro/steering/testing.md": {
+      "sha256": "1f29f0fb6c36bfb92191d46e1cc218bcc5088f954c1fbac18601a739e6ea6538",
+      "sources": ["harness/guidance/testing.md"]
+    }
+  }
+}

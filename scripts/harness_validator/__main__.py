@@ -13,7 +13,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import capabilities_check, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
+from . import capabilities_check, generator_checks, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
@@ -32,6 +32,8 @@ class Run:
         self.root = root
         self.findings = []
         self.files = set()
+        self.notes = []
+        self.generated = set()
 
     def rel(self, path: Path) -> str:
         try:
@@ -126,7 +128,7 @@ def load_lib_module(root: Path, name: str):
 
 
 def check_steering_files(run: Run, patterns) -> None:
-    directory = run.root / ".kiro/steering"
+    directory = run.root / "harness/guidance"
     for path in sorted(directory.glob("*.md")) if directory.is_dir() else []:
         rel = run.rel(path)
         run.files.add(rel)
@@ -186,6 +188,15 @@ def check_mcp_file(run: Run, config) -> None:
         return
     run.guarded("mcp", MCP_PATH, mcp.check_mcp, MCP_PATH, text, env_example, config)
     run.guarded("secret scan", MCP_PATH, _secret_findings, MCP_PATH, _json_pairs(text), config.secret_patterns)
+
+
+def check_generator(run: Run) -> None:
+    if not (run.root / "harness/manifest.json").is_file():
+        return  # a project that does not use the Generator has no Manifest
+    findings, notes, generated = generator_checks.check_generated(run.root)
+    run.findings.extend(findings)
+    run.notes.extend(notes)
+    run.generated |= generated
 
 
 def check_capabilities(run: Run) -> None:
@@ -312,7 +323,7 @@ def check_placeholders(run: Run) -> list:
     for path in files:
         rel = run.rel(path)
         run.files.add(rel)
-        if rel == README:
+        if rel == README or rel in run.generated:
             continue
         text, _ = _read_text(path)
         if text is None:
@@ -345,6 +356,12 @@ def check_placeholders(run: Run) -> list:
 
 def validate(root) -> tuple:
     """Run every check. Return ``(findings, files_checked)``."""
+    findings, files, _notes = validate_full(root)
+    return findings, files
+
+
+def validate_full(root) -> tuple:
+    """Run every check. Return ``(findings, files_checked, notes)``."""
     root = Path(root).resolve()
     run = Run(root)
     config = None
@@ -362,8 +379,9 @@ def validate(root) -> tuple:
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)
     run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
+    run.guarded("generator", "harness/manifest.json", check_generator, run)
     run.guarded("placeholder scan", README, check_placeholders, run)
-    return run.findings, len(run.files)
+    return run.findings, len(run.files), run.notes
 
 
 def main(argv=None, stdout=None) -> int:
@@ -372,8 +390,9 @@ def main(argv=None, stdout=None) -> int:
     parser.add_argument("--root", default=".", help="workspace root (default: current directory)")
     args = parser.parse_args(argv)
     try:
-        findings, files_checked = validate(args.root)
+        findings, files_checked, notes = validate_full(args.root)
         text, code = report.render(findings, files_checked)
+        text = "".join(f"{note}\n" for note in notes) + text
     except Exception:
         traceback.print_exc()
         return 2

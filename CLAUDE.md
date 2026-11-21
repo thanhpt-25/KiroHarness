@@ -13,6 +13,7 @@ The normative spec is `.kiro/specs/kiro-agent-harness-template/requirements.md` 
 Requires Python 3.10+ and POSIX `sh`. All commands run from the repo root.
 
 ```sh
+scripts/harness sync [--check]       # regenerate Agent files from harness/manifest.json (drift is a validator error)
 scripts/validate.sh                 # config validator + hook/validator unit tests (offline). Run before finishing.
 scripts/validate-config.sh          # config validator only (exit 0 ok, 1 errors, 2 internal crash)
 scripts/test-properties.sh          # Hypothesis property suite (uses uv, else creates .venv from requirements-dev.txt)
@@ -53,6 +54,8 @@ scripts/validate.sh -> scripts/validate-config.sh -> python3 -I -m harness_valid
 - Destructive command guard **fails closed**: a match, malformed input, missing policy, or missing python3 all exit 2 (block).
 - Risky tool guard **fails to "ask"**: unusable input or policy requests user approval rather than allowing or blocking.
 Preserve these when editing guards. Tests assert them.
+
+**Generator (`scripts/harness`, `scripts/harness_cli/`).** `harness/manifest.json` (schema in `manifest.schema.json`, checked by `harness_validator/manifest.py`) plus `harness/guidance/*.md` and `harness/kiro/hooks/*.json` are the sources. `scripts/harness sync [--check] [--force]` renders `.kiro/steering`, `.kiro/hooks/<shipped>.json`, `.kiro/settings/mcp.json` (byte-identical to the frozen baseline in `tests/fixtures/baseline/`, except the Untrusted Tool Output section in security) and, for enabled Agents, `AGENTS.md`, `CLAUDE.md`, `.claude/rules`, `.cursor/rules`, `.github/copilot-instructions.md`. `plan.build_plan` is pure; `sync.py` writes, drift-checks and protects hand edits via `harness/generated.lock.json`. **Edit sources, never the generated files**; the validator reports DRIFT. Steering and placeholder checks run on `harness/guidance/`. ADR 0007.
 
 **Config validator (`scripts/harness_validator/`)** is standard-library-only and offline, with one module per concern: `hookconfig` (parse/print hook JSON, with round-trip and idempotence properties), `hook_rules`, `frontmatter` (a YAML subset parser), `steering`, `mcp`, `secrets`, `placeholders`, `envfile`, `globmatch`, `report`. `__main__.py` runs every checker, wrapping each in `Run.guarded` so one crashing checker becomes an `[INTERNAL]` finding instead of hiding the rest. It reuses guard parsing code by loading modules from `harness/core/` directly; it does not duplicate it. Tunables (secret regexes, MCP read-only allowlist, known mutating tools, minimum versions) are in `scripts/validator-config.json`.
 
