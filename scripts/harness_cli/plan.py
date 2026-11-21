@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 
 from harness_validator import frontmatter, globmatch, hookconfig, manifest as manifest_mod
 
-from . import jsonfmt
+from . import jsonfmt, permissions
 
 LOCK_PATH = "harness/generated.lock.json"
 KIRO_HOOKS = {
@@ -27,6 +27,8 @@ KIRO_HOOKS = {
     "stop-validate": ("quality", "stop_validate"),
     "session-start-context": ("quality", "session_start"),
 }
+GUARD_NAMES = {"destructive": "destructive-command-guard", "risky": "risky-tool-guard", "prompt_secrets": "prompt-secret-scan"}
+PRE_TOOL_GUARDS = ("destructive", "risky")
 UNVERIFIED = ("cursor", "copilot")  # output formats not confirmed against vendor docs (ADR 0007)
 BUDGET_LINES = 300
 BUDGET_CHARS = 12000
@@ -145,6 +147,23 @@ def _with_header(front: str, body: str, sources, version: str) -> str:
     return f"{prefix}{header(sources, version)}\n\n{body.strip(chr(10))}\n"
 
 
+# ---- MCP ----------------------------------------------------------------
+
+def mcp_servers(manifest, kiro: bool = False) -> dict:
+    """Server objects with the Manifest's pins and Secret_References; Kiro adds disabled and autoApprove."""
+    servers = {}
+    for name in sorted(manifest["mcp"]):
+        item = manifest["mcp"][name]
+        server = {"command": item.get("runner", "uvx"), "args": [f"{item['package']}@{item['version']}", *item["args"]]}
+        if item.get("env"):
+            server["env"] = dict(item["env"])
+        if kiro:
+            server["disabled"] = item["disabled"]
+            server["autoApprove"] = list(item["auto_approve"])
+        servers[name] = server
+    return servers
+
+
 # ---- Kiro ---------------------------------------------------------------
 
 def render_kiro(root, manifest, sources, plan) -> None:
@@ -159,15 +178,7 @@ def render_kiro(root, manifest, sources, plan) -> None:
         with open(os.path.join(root, rel), "rb") as handle:
             hook = hookconfig.parse_hook_bytes(handle.read(), rel)
         plan.add(Planned(f".kiro/hooks/{name}.json", hookconfig.print_hook_file(hook), (rel,)))
-    servers = {}
-    for name in sorted(manifest["mcp"]):
-        item = manifest["mcp"][name]
-        server = {"command": item.get("runner", "uvx"), "args": [f"{item['package']}@{item['version']}", *item["args"]]}
-        if item.get("env"):
-            server["env"] = dict(item["env"])
-        server["disabled"] = item["disabled"]
-        server["autoApprove"] = list(item["auto_approve"])
-        servers[name] = server
+    servers = mcp_servers(manifest, kiro=True)
     plan.add(Planned(".kiro/settings/mcp.json", jsonfmt.dumps({"mcpServers": servers}) + "\n", ("harness/manifest.json",)))
 
 
@@ -195,7 +206,50 @@ def _agents_md(sources, version) -> Planned:
     return Planned("AGENTS.md", f"{header(used, version)}\n\n{body}\n", used, ("claude-code", "cursor", "copilot", "codex"))
 
 
+def _capabilities(root) -> dict:
+    try:
+        with open(os.path.join(root, "harness/capabilities.json"), encoding="utf-8") as handle:
+            return json.load(handle)["agents"]["claude-code"]
+    except (OSError, ValueError, KeyError) as exc:
+        raise manifest_mod.ManifestError([f"harness/capabilities.json has no usable claude-code entry: {exc}"])
+
+
+def _guard_command(trigger: str, keys) -> str:
+    only = ""
+    if len(keys) != len(PRE_TOOL_GUARDS if trigger == "pre_tool" else ("prompt_secrets",)):
+        only = " --only " + ",".join(GUARD_NAMES[k] for k in keys)
+    return f'"$CLAUDE_PROJECT_DIR"/harness/bin/guard claude-code {trigger}{only}'
+
+
+def render_claude_native(root, manifest, plan) -> None:
+    """``.claude/settings.json`` (hooks, permissions) and ``.mcp.json`` (agent-harness-platform R8.1 to R8.3)."""
+    entry = _capabilities(root)
+    hooks: dict = {}
+    pre = [k for k in PRE_TOOL_GUARDS if manifest["guards"].get(k, {}).get("enabled")]
+    if pre:
+        tools = sorted(entry["tool_map"]) + [prefix + ".*" for prefix in sorted(entry["tool_prefix_map"])]
+        hooks["PreToolUse"] = [{"matcher": "^(" + "|".join(tools) + ")$",
+                                "hooks": [{"type": "command", "command": _guard_command("pre_tool", pre), "timeout": 5}]}]
+    if manifest["guards"].get("prompt_secrets", {}).get("enabled"):
+        hooks["UserPromptSubmit"] = [{"hooks": [{"type": "command", "command": _guard_command("prompt_submit", ["prompt_secrets"]), "timeout": 5}]}]
+    if manifest["quality"].get("session_start"):
+        hooks["SessionStart"] = [{"hooks": [{"type": "command", "command": '"$CLAUDE_PROJECT_DIR"/harness/bin/session-start', "timeout": 10}]}]
+    if manifest["quality"].get("stop_validate"):
+        hooks["Stop"] = [{"hooks": [{"type": "command", "command": '"$CLAUDE_PROJECT_DIR"/harness/bin/stop-validate', "timeout": 300}]}]
+    rules = permissions.derive(root, entry, manifest["mcp"])
+    for item in rules["skipped"]:
+        plan.warnings.append(f"claude-code: no permission rule for {item}; the hook is the only layer")
+    settings = {"permissions": {"allow": rules["allow"], "ask": rules["ask"], "deny": rules["deny"]}, "hooks": hooks}
+    disabled = sorted(name for name, item in manifest["mcp"].items() if item["disabled"])
+    if disabled:
+        settings["disabledMcpjsonServers"] = disabled
+    sources = ("harness/manifest.json", "harness/policy/destructive-commands.txt", "harness/policy/risky-tools.conf", "harness/capabilities.json")
+    plan.add(Planned(".claude/settings.json", jsonfmt.dumps(settings) + "\n", sources))
+    plan.add(Planned(".mcp.json", jsonfmt.dumps({"mcpServers": mcp_servers(manifest)}) + "\n", ("harness/manifest.json",)))
+
+
 def render_claude(root, manifest, sources, plan) -> None:
+    render_claude_native(root, manifest, plan)
     agent = manifest["agents"]["claude-code"]
     maintainer, used = "", ["harness/guidance"]
     if agent.get("maintainer"):
@@ -262,9 +316,45 @@ def build_plan(root, manifest=None) -> Plan:
             render_kiro(root, manifest, sources, plan)
         else:
             RENDERERS[agent](root, manifest, sources, plan)
+    render_capabilities_doc(root, plan)
     if manifest.get("agents_md") or any(a != "kiro" for a in enabled):
         plan.add(_agents_md(sources, plan.version))
     return plan
+
+
+FILES_BY_AGENT = {
+    "kiro": ".kiro/steering/, .kiro/hooks/ (shipped hooks), .kiro/settings/mcp.json",
+    "claude-code": "AGENTS.md, CLAUDE.md, .claude/rules/, .claude/settings.json, .mcp.json",
+    "cursor": ".cursor/rules/*.mdc (and AGENTS.md)",
+    "copilot": ".github/copilot-instructions.md, .github/instructions/ (and AGENTS.md)",
+}
+GUARD_COLUMNS = (("destructive", "Destructive command guard"), ("risky", "Risky tool guard"), ("prompt_secrets", "Prompt secret scan"))
+
+
+def render_capabilities_doc(root, plan) -> None:
+    """``docs/reference/capabilities.md``: protection level per Agent and guard, from the matrix (R9.1, R9.3)."""
+    with open(os.path.join(root, "harness/capabilities.json"), encoding="utf-8") as handle:
+        agents = json.load(handle)["agents"]
+    lines = ["# Capability matrix", "",
+             "Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks), **permission-only** (the Agent's own permission rules, no hook), **guidance-only** (the rule is text the Agent may ignore). `documented` means the contract was read from vendor documentation; it becomes `verified` only after a Manual_Check_Record exists under `docs/verification/`.", "",
+             "| Agent | Status | " + " | ".join(label for _k, label in GUARD_COLUMNS) + " |",
+             "|---|---|" + "---|" * len(GUARD_COLUMNS)]
+    for name, entry in sorted(agents.items()):
+        levels = " | ".join(entry.get("protection", {}).get(key, "n/a") for key, _l in GUARD_COLUMNS)
+        lines.append(f"| {entry['label']} | {entry['status']} | {levels} |")
+    lines += ["", "## Files the Generator writes", ""]
+    for name, entry in sorted(agents.items()):
+        lines.append(f"- {entry['label']}: {FILES_BY_AGENT.get(name, 'none')}")
+    lines += ["", "## Known gaps", ""]
+    for name, entry in sorted(agents.items()):
+        for gap in entry.get("gaps", []):
+            lines.append(f"- {entry['label']}: {gap}")
+    lines += ["", "## Verification", ""]
+    for name, entry in sorted(agents.items()):
+        verified = entry.get("verified", {})
+        lines.append(f"- {entry['label']}: {verified.get('source', 'no source recorded')} ({verified.get('date', 'no date')})")
+    text = header(("harness/capabilities.json",), plan.version) + "\n\n" + "\n".join(lines) + "\n"
+    plan.add(Planned("docs/reference/capabilities.md", text, ("harness/capabilities.json",)))
 
 
 def lock_text(plan: Plan) -> str:

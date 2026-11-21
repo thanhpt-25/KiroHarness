@@ -9,7 +9,7 @@ import adapters
 import capabilities
 
 CAPS = capabilities.load_capabilities()
-AGENTS = sorted(CAPS["agents"])
+AGENTS = sorted(a for a, e in CAPS["agents"].items() if e.get("hooks", True))  # agents with an Adapter
 
 text = st.text(alphabet=string.ascii_letters + string.digits + " ./_-:", min_size=1, max_size=30)
 words = st.sampled_from(["ls", "echo hi", "git status", "rm -rf /", "git push --force", "DROP TABLE x", "terraform apply",

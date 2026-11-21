@@ -28,6 +28,8 @@ class SourceRoot:
         shutil.copy(ROOT / "harness/manifest.schema.json", root / "harness/manifest.schema.json")
         shutil.copytree(ROOT / "harness/guidance", root / "harness/guidance")
         shutil.copytree(ROOT / "harness/kiro", root / "harness/kiro")
+        shutil.copytree(ROOT / "harness/policy", root / "harness/policy")
+        shutil.copy(ROOT / "harness/capabilities.json", root / "harness/capabilities.json")
         self.write_manifest(root, self.manifest)
         return root
 

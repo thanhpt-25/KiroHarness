@@ -56,7 +56,7 @@ class CombinedGuard(unittest.TestCase):
         checked = set()
         for entry in entries:
             example = json.loads(lines[entry.line_no - 2].split("# example:", 1)[1])
-            for agent in caps["agents"]:
+            for agent in [a for a, e in caps["agents"].items() if e.get("hooks", True)]:
                 subject = risky_guard.example_subject(entry, caps, agent=agent)
                 if subject is None:
                     continue
@@ -65,7 +65,7 @@ class CombinedGuard(unittest.TestCase):
                 self.assertEqual(code, 0, detail((agent, entry.line), "exit 0", code))
                 self.assertEqual(json.loads(out)["hookSpecificOutput"]["permissionDecision"], "ask", detail((agent, entry.line), "ask", out))
                 checked.add(agent)
-        self.assertEqual(checked, set(caps["agents"]))
+        self.assertEqual(checked, {a for a, e in caps["agents"].items() if e.get("hooks", True)})
 
     def test_malformed_input_applies_failure_semantics(self):
         for agent in SHELL:

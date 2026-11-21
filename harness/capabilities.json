@@ -27,18 +27,48 @@
         "stop": "Stop"
       },
       "output": {
-        "deny": {"exit": 2, "channel": "stderr"},
-        "ask": {"exit": 0, "channel": "stdout", "json": "hookSpecificOutput", "include_event_name": false}
+        "deny": {
+          "exit": 2,
+          "channel": "stderr"
+        },
+        "ask": {
+          "exit": 0,
+          "channel": "stdout",
+          "json": "hookSpecificOutput",
+          "include_event_name": false
+        }
       },
       "tool_map": {
-        "execute_bash": {"category": "shell", "command": "command"},
-        "execute_pwsh": {"category": "shell", "command": "command"},
-        "control_bash_process": {"category": "shell", "command": "command"},
-        "delete_file": {"category": "delete", "paths": ["targetFile"]},
-        "web_fetch": {"category": "web", "url": "url"}
+        "execute_bash": {
+          "category": "shell",
+          "command": "command"
+        },
+        "execute_pwsh": {
+          "category": "shell",
+          "command": "command"
+        },
+        "control_bash_process": {
+          "category": "shell",
+          "command": "command"
+        },
+        "delete_file": {
+          "category": "delete",
+          "paths": [
+            "targetFile"
+          ]
+        },
+        "web_fetch": {
+          "category": "web",
+          "url": "url"
+        }
       },
-      "tool_prefix_map": {"@": "mcp"},
-      "mcp": {"path": ".kiro/settings/mcp.json", "root_key": "mcpServers"},
+      "tool_prefix_map": {
+        "@": "mcp"
+      },
+      "mcp": {
+        "path": ".kiro/settings/mcp.json",
+        "root_key": "mcpServers"
+      },
       "permissions": null,
       "protection": {
         "destructive": "enforced",
@@ -48,7 +78,8 @@
       },
       "gaps": [
         "Kiro file read and write tool IDs are not yet recorded, so protected-path checks cover shell and delete tools only. Import payloads with scripts/import-payloads.sh and extend tool_map."
-      ]
+      ],
+      "hooks": true
     },
     "claude-code": {
       "label": "Claude Code",
@@ -73,24 +104,89 @@
         "stop": "Stop"
       },
       "output": {
-        "deny": {"exit": 2, "channel": "stderr"},
-        "ask": {"exit": 0, "channel": "stdout", "json": "hookSpecificOutput", "include_event_name": true}
+        "deny": {
+          "exit": 2,
+          "channel": "stderr"
+        },
+        "ask": {
+          "exit": 0,
+          "channel": "stdout",
+          "json": "hookSpecificOutput",
+          "include_event_name": true
+        }
       },
       "tool_map": {
-        "Bash": {"category": "shell", "command": "command"},
-        "PowerShell": {"category": "shell", "command": "command"},
-        "Read": {"category": "read", "paths": ["file_path"]},
-        "Glob": {"category": "read", "paths": ["path"]},
-        "Grep": {"category": "read", "paths": ["path"]},
-        "Write": {"category": "write", "paths": ["file_path"]},
-        "Edit": {"category": "write", "paths": ["file_path"]},
-        "MultiEdit": {"category": "write", "paths": ["file_path"]},
-        "NotebookEdit": {"category": "write", "paths": ["notebook_path"]},
-        "WebFetch": {"category": "web", "url": "url"}
+        "Bash": {
+          "category": "shell",
+          "command": "command"
+        },
+        "PowerShell": {
+          "category": "shell",
+          "command": "command"
+        },
+        "Read": {
+          "category": "read",
+          "paths": [
+            "file_path"
+          ]
+        },
+        "Glob": {
+          "category": "read",
+          "paths": [
+            "path"
+          ]
+        },
+        "Grep": {
+          "category": "read",
+          "paths": [
+            "path"
+          ]
+        },
+        "Write": {
+          "category": "write",
+          "paths": [
+            "file_path"
+          ]
+        },
+        "Edit": {
+          "category": "write",
+          "paths": [
+            "file_path"
+          ]
+        },
+        "MultiEdit": {
+          "category": "write",
+          "paths": [
+            "file_path"
+          ]
+        },
+        "NotebookEdit": {
+          "category": "write",
+          "paths": [
+            "notebook_path"
+          ]
+        },
+        "WebFetch": {
+          "category": "web",
+          "url": "url"
+        }
       },
-      "tool_prefix_map": {"mcp__": "mcp"},
-      "mcp": {"path": ".mcp.json", "root_key": "mcpServers"},
-      "permissions": {"path": ".claude/settings.json", "key": "permissions", "rules": ["allow", "ask", "deny"]},
+      "tool_prefix_map": {
+        "mcp__": "mcp"
+      },
+      "mcp": {
+        "path": ".mcp.json",
+        "root_key": "mcpServers"
+      },
+      "permissions": {
+        "path": ".claude/settings.json",
+        "key": "permissions",
+        "rules": [
+          "allow",
+          "ask",
+          "deny"
+        ]
+      },
       "hooks_file": ".claude/settings.json",
       "protection": {
         "destructive": "enforced",
@@ -99,14 +195,72 @@
         "protected_paths": "enforced"
       },
       "gaps": [
-        "Bash deny rules are prefix patterns and can be bypassed by rewriting a command; the hook is the stronger layer."
+        "Bash deny rules are prefix patterns and can be bypassed by rewriting a command; the hook is the stronger layer.",
+        "on_save and post_task quality hooks are Kiro-specific and are not rendered for Claude Code."
+      ],
+      "hooks": true
+    },
+    "cursor": {
+      "label": "Cursor",
+      "status": "unverified",
+      "hooks": false,
+      "verified": {
+        "min": null,
+        "max": null,
+        "date": "2026-11-21",
+        "source": "none; output format follows the design mapping and is unverified"
+      },
+      "guidance": {
+        "always": ".cursor/rules/*.mdc (alwaysApply: true)",
+        "fileMatch": ".cursor/rules/*.mdc (globs)",
+        "auto": ".cursor/rules/*.mdc (description only)",
+        "manual": ".cursor/rules/*.mdc without globs"
+      },
+      "protection": {
+        "destructive": "guidance-only",
+        "risky": "guidance-only",
+        "prompt_secrets": "guidance-only",
+        "protected_paths": "guidance-only"
+      },
+      "gaps": [
+        "Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it."
+      ]
+    },
+    "copilot": {
+      "label": "GitHub Copilot",
+      "status": "unverified",
+      "hooks": false,
+      "verified": {
+        "min": null,
+        "max": null,
+        "date": "2026-11-21",
+        "source": "none; output format follows the design mapping and is unverified"
+      },
+      "guidance": {
+        "always": ".github/copilot-instructions.md",
+        "fileMatch": ".github/instructions/*.instructions.md (applyTo)",
+        "auto": "not supported; applies to every file",
+        "manual": "linked from copilot-instructions.md"
+      },
+      "protection": {
+        "destructive": "guidance-only",
+        "risky": "guidance-only",
+        "prompt_secrets": "guidance-only",
+        "protected_paths": "guidance-only"
+      },
+      "gaps": [
+        "Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it."
       ]
     }
   },
   "deferred": [
-    {"agent": "cursor", "reason": "Official documentation was not reachable from the build environment on 2026-11-21; no payload recorded. Add after Task 7 verification."},
-    {"agent": "copilot", "reason": "Same as cursor."},
-    {"agent": "codex", "reason": "Same as cursor."},
-    {"agent": "gemini", "reason": "Same as cursor."}
+    {
+      "agent": "codex",
+      "reason": "Same as cursor."
+    },
+    {
+      "agent": "gemini",
+      "reason": "Same as cursor."
+    }
   ]
 }

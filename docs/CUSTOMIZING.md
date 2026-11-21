@@ -369,6 +369,33 @@ scripts/harness sync --force    # overwrite files that were edited by hand
 
 Cursor and Copilot output formats are not yet verified against vendor documentation, and `sync` prints a warning for them. Where an Agent cannot express an inclusion mode (for example `auto`), the Generator uses a fallback and warns.
 
+## Supported Agents
+
+The protection level of each Agent per guard is generated in [docs/reference/capabilities.md](reference/capabilities.md). Edit `harness/capabilities.json`, not that file.
+
+### Kiro IDE
+
+Protection: all three guards enforced by hooks (status `documented` until the IDE checks in `docs/verification/kiro/RUNBOOK.md` are recorded). Files: `.kiro/steering/`, the shipped `.kiro/hooks/*.json`, `.kiro/settings/mcp.json`. Verify: run `scripts/validate.sh`, then the Kiro runbook.
+
+### Claude Code
+
+Enable it with `"claude-code": {"enabled": true}` in `harness/manifest.json` and run `scripts/harness sync`. Files: `AGENTS.md`, `CLAUDE.md` (imports `AGENTS.md`), `.claude/rules/`, `.claude/settings.json`, `.mcp.json`.
+
+- Hooks run `harness/bin/guard claude-code pre_tool` for shell, file, web and MCP tools, `prompt_submit` for prompts, `harness/bin/session-start`, and `harness/bin/stop-validate` (the agent cannot finish while `scripts/validate.sh` fails; it never loops).
+- `permissions.deny` and `permissions.ask` come from the policy files in `harness/policy/`, so rules with a literal form still apply when a hook does not run. Entries with no literal form (the web host allowlist, `rm -rf *`) are listed as warnings by `sync` and stay hook-only. Permission rules are prefix matches; the hook is the stronger layer.
+- MCP servers come from the Manifest into `.mcp.json`; `autoApprove` becomes `permissions.allow` entries and disabled servers go to `disabledMcpjsonServers`.
+- Your own settings go in `.claude/settings.local.json`; `.claude/settings.json` is generated.
+- The `on_save` and `post_task` quality hooks are Kiro-specific and are not rendered.
+- Verify with `docs/verification/claude-code/RUNBOOK.md`.
+
+### Cursor and GitHub Copilot
+
+Guidance-only: `.cursor/rules/*.mdc`, `.github/copilot-instructions.md` and `.github/instructions/`. No guard is enforced for these Agents, and their output formats are unverified, so `sync` warns. Do not rely on them for safety; use Kiro or Claude Code hooks for enforcement.
+
+## MCP tool inventories
+
+`scripts/harness mcp-inventory` starts each pinned server (needs `uvx` and network) and writes `harness/mcp/<server>.tools.json` with a SHA-256 per tool name, description and input schema. `scripts/harness mcp-inventory --check` compares live tools with the record. When an inventory exists, the validator errors if a Manifest `auto_approve` tool is missing from it or the inventory's version differs from the pin. `scripts/check-mcp-updates.sh` also lists OSV advisories for each pin and still edits nothing.
+
 ## Continuous Integration
 
 The Template ships two GitHub Actions workflows in `.github/workflows/`:
