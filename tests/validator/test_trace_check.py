@@ -15,9 +15,9 @@ class TraceCheck(unittest.TestCase):
         with TemplateCopy() as root:
             backlog = root / trace_check.BACKLOG
             lines = backlog.read_text().splitlines()
-            backlog.write_text("\n".join(l for l in lines if not l.endswith("R14.4")) + "\n")
+            backlog.write_text("\n".join(l for l in lines if not l.endswith("/R1.4")) + "\n")
             codes = [(f.rule, f.message) for f in trace_check.check(str(root))]
-            self.assertTrue(any(c == "TRACE-UNCOVERED" and "R14.4" in m for c, m in codes), codes)
+            self.assertTrue(any(c == "TRACE-UNCOVERED" and "/R1.4" in m for c, m in codes), codes)
 
     def test_dangling_tag_is_an_error(self):
         with TemplateCopy() as root:
