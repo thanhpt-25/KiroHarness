@@ -265,7 +265,7 @@ The order is: pure validator building blocks (Hook_Config_Parser/Printer, report
     - Write `.kiro/hooks/scripts/post-task-tests.sh` and `.kiro/hooks/scripts/lib/post_task.py`: run `scripts/test.sh` with no file argument through `run_with_deadline` with `CI=true` and a 290-second deadline; exit 0 on pass, exit 2 with the last 200 output lines on stderr on failure or timeout, exit 0 with the not-configured message when `TEST_COMMAND` is a placeholder or empty; executable bit, mode 100755
     - _Requirements: 1.4, 1.5, 7.3, 7.8_
 
-- [-] 10. Checkpoint - Ensure all tests pass
+- [x] 10. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 11. Create the shipped Template content and the Config_Validator entry point
@@ -279,7 +279,7 @@ The order is: pure validator building blocks (Hook_Config_Parser/Printer, report
     - `security.md` has the four `##` headings from the design; `tech.md` declares Python 3.10+ and POSIX `sh`, the minimum supported Kiro IDE version, and the date the MCP pins were checked; project-specific values use `{{PLACEHOLDER_NAME}}` placeholders
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 10.11_
 
-  - [~] 11.3 Write the MCP_Config and Env_Example_File
+  - [ ] 11.3 Write the MCP_Config and Env_Example_File
     - Write `.kiro/settings/mcp.json` with the `aws-docs`, `fetch`, and `git` entries from the design (re-check versions on PyPI first; keep the git pin at or above 2026.10.28)
     - Write `.env.example` documenting the format with placeholder values that match no secret pattern, listing every variable referenced by the shipped `mcp.json`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8_
@@ -380,7 +380,7 @@ The order is: pure validator building blocks (Hook_Config_Parser/Printer, report
     - `tests/integration/test_mcp_servers.py`, skipped unless `HARNESS_INTEGRATION=1`: start each pinned server through `uvx`, list its tools, confirm every `autoApprove` name exists, and confirm the git server's `git_status` reports the workspace repository
     - _Requirements: 8.1, 8.5, 8.8_
 
-- [~] 15. Final checkpoint - Ensure all tests pass
+- [ ] 15. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
