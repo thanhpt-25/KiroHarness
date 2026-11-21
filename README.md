@@ -74,8 +74,8 @@ The main hook definitions are in .kiro/hooks/; implementation and policy files a
 
 | Hook | Trigger | Behavior |
 |---|---|---|
-| Destructive command guard | PreToolUse | Blocks shell commands matching destructive-commands.txt; malformed input or missing policy fails closed. |
-| Risky tool guard | PreToolUse | Asks for confirmation for configured risky tools and arguments in risky-tools.conf. |
+| Destructive command guard | PreToolUse | Blocks shell commands matching harness/policy/destructive-commands.txt; malformed input or missing policy fails closed. |
+| Risky tool guard | PreToolUse | Asks for confirmation for configured risky tools and arguments in harness/policy/risky-tools.conf. |
 | Quality on save | PostFileSave | Runs the configured linter on the saved source file; runs the test command for recognized test-file names. |
 | Session context | SessionStart | Adds the current Git branch and working-tree change count to session context. |
 | Prompt secret scan | UserPromptSubmit | Checks submitted prompt text against configured secret patterns and blocks detected values. |

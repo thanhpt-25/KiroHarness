@@ -8,6 +8,7 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -151,15 +152,19 @@ class Hooks(unittest.TestCase):
     def test_risky_guard_matcher_covers_every_listed_tool(self):
         matcher = re.compile(hook("risky-tool-guard.json")["matcher"])
         conf = (ROOT / "harness/policy/risky-tools.conf").read_text()
-        tools = {line.split(" | ")[0].strip() for line in conf.splitlines() if line.strip() and not line.startswith("#")}
+        sys.path.insert(0, str(ROOT / "harness/core"))
+        import capabilities, risky_guard
+        caps = capabilities.load_capabilities()
+        tools = {t for entry in risky_guard.parse_list(conf) for t in risky_guard.kiro_tools(entry, caps)}
+        self.assertTrue(tools)
         for tool in tools:
             self.assertTrue(matcher.fullmatch(tool), tool)
 
     def test_default_risky_list_covers_deletion_fetch_and_deploy(self):
         conf = (ROOT / "harness/policy/risky-tools.conf").read_text()
-        self.assertRegex(conf, r"(?m)^delete_file \|")
-        self.assertRegex(conf, r"(?m)^web_fetch \|.*host-not-in")
-        self.assertRegex(conf, r"(?m)^execute_bash \| Deploy")
+        self.assertRegex(conf, r"(?m)^category:delete \|")
+        self.assertRegex(conf, r"(?m)^category:web \|.*host-not-in")
+        self.assertRegex(conf, r"(?m)^category:shell \| Deploy")
 
     def test_quality_hook_matcher_and_timeout(self):
         definition = hook("quality-on-save.json")

@@ -11,6 +11,7 @@ changes. Records are numbered and never deleted; a replaced decision is marked
 | [0003](0003-printer-key-order-for-optional-fields.md) | Printer key order for optional hook fields | Accepted | kiro-agent-harness-template/R9.7 |
 | [0004](0004-validator-hook-scope.md) | Validator hook scope | Accepted | kiro-agent-harness-template/R10.1 |
 | [0005](0005-git-server-confinement.md) | Git MCP server confinement with `--repository .` | Accepted, pending IDE check | kiro-agent-harness-template/R8.8 |
+| [0006](0006-agent-neutral-core-layout.md) | Agent-neutral core layout and supported agents | Accepted | agent-harness-platform/R4.1, R4.2, R5.1, R9.1 |
 
 ## Template
 

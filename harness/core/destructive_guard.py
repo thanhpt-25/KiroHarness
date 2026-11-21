@@ -86,6 +86,11 @@ def load_patterns(path) -> list:
     return patterns
 
 
+def format_list(patterns) -> str:
+    """Canonical list text; ``load_patterns`` on it gives equal patterns (Property 44)."""
+    return "".join(pattern.text + "\n" for pattern in patterns)
+
+
 def match_segment(pattern: Pattern, segment) -> bool:
     """True when the pattern tokens occur in order within the segment tokens."""
     tokens = tokenize(segment) if isinstance(segment, str) else segment
