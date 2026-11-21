@@ -323,7 +323,7 @@ def check_placeholders(run: Run) -> list:
     for path in files:
         rel = run.rel(path)
         run.files.add(rel)
-        if rel == README or rel in run.generated:
+        if rel == README or rel in run.generated or rel.startswith("tests/fixtures/baseline/"):  # frozen snapshot of generated files
             continue
         text, _ = _read_text(path)
         if text is None:
