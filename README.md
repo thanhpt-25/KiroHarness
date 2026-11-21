@@ -1,5 +1,7 @@
 # Kiro Agent Harness Template
 
+[![ci](https://github.com/thanhpt-25/KiroHarness/actions/workflows/ci.yml/badge.svg)](https://github.com/thanhpt-25/KiroHarness/actions/workflows/ci.yml)
+
 A reusable Kiro IDE harness for adding project context, safety checks, quality hooks, MCP servers, and a self-validator to a repository. The template includes working hook scripts and tests, plus clear places to add project-specific conventions and commands.
 
 ## What it provides
@@ -121,7 +123,7 @@ To compare package pins with current PyPI versions, run scripts/check-mcp-update
 | HARNESS_INTEGRATION=1 python3 -m unittest tests.integration.test_mcp_servers | Start configured MCP servers and check their tools and repository scope. | Networked and opt-in |
 | scripts/check-mcp-updates.sh | Compare pinned packages with current versions. | Networked and opt-in |
 
-The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook checks for a non-blank subject of at most 72 characters with no trailing whitespace. The pre-push hook runs the property suite in offline mode and requires Hypothesis to already be installed. Git hooks are local developer checks and can be bypassed; enforce required checks in CI or server-side branch protection.
+The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook checks for a non-blank subject of at most 72 characters with no trailing whitespace. The pre-push hook runs the property suite in offline mode and requires Hypothesis to already be installed. Git hooks are local developer checks and can be bypassed. The shipped CI workflow (`.github/workflows/ci.yml`) runs the same checks on every push and pull request; make it a required check in branch protection.
 
 ## Repository layout
 
@@ -142,13 +144,17 @@ The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook c
 | `tests/validator/` | Validator and template content tests. |
 | `tests/property/` | Hypothesis property tests. |
 | `tests/integration/` | Opt-in MCP server integration tests. |
+| `.github/workflows/` | CI (`ci.yml`) and the opt-in MCP integration workflow (`integration.yml`). |
+| `docs/adr/` | Architecture decision records. |
 
 ## Documentation
 
-- [Customizing the harness](docs/CUSTOMIZING.md): steering formats, hooks, guard lists, MCP configuration, CI example, and manual IDE checks.
+- [Customizing the harness](docs/CUSTOMIZING.md): steering formats, hooks, guard lists, MCP configuration, CI, and manual IDE checks.
 - [Git hook implementation best practices](docs/GIT_HOOKS.md): hook setup, behavior, and safety.
 - [Project overview](docs/PROJECT_OVERVIEW.md): architecture and subsystem responsibilities.
 - [Implementation status](docs/IMPLEMENTATION_STATUS.md): current capabilities, checks, and known gaps.
+- [Architecture decisions](docs/adr/README.md): recorded design decisions and accepted deviations from the spec.
+- [Platform roadmap spec](.kiro/specs/agent-harness-platform/requirements.md): the plan to extend the harness to other AI coding agents.
 
 ## Placeholders
 

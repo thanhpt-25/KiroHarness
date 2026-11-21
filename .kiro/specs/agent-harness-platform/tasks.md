@@ -15,40 +15,40 @@ Conventions for every task:
 
 ### Phase 0: Baseline
 
-- [ ] 1. Establish a clean baseline
-  - [ ] 1.1 Commit the current work
+- [x] 1. Establish a clean baseline
+  - [x] 1.1 Commit the current work
     - Review and commit the pending edits to the Template spec `tasks.md`, `tasks.meta.json`, and the new root `CLAUDE.md` on a branch, with a pull request
     - _Requirements: 1.1_
-  - [ ] 1.2 Reconcile the Template spec task list
+  - [x] 1.2 Reconcile the Template spec task list
     - For each task in `.kiro/specs/kiro-agent-harness-template/tasks.md`, find the code and tests it names, run them, and set the checkbox from the result
     - Add a reconciliation table (task, evidence, result) to `docs/IMPLEMENTATION_STATUS.md`
     - _Requirements: 1.2_
-  - [ ] 1.3 Clear the 16 `PLACEHOLDER-STALE` warnings
-    - Remove stale entries from the README placeholder inventory or restore the placeholders they describe, whichever matches the intended template content
+  - [x] 1.3 Clear the 16 `PLACEHOLDER-STALE` warnings
+    - Already cleared before Phase 0 started (validator reported 0 warnings); this task added the regression test
     - Add a test in `tests/validator/test_template_content.py` that the shipped Template produces zero warnings
     - _Requirements: 1.3_
-  - [ ] 1.4 Close the Template spec known gaps
+  - [x] 1.4 Close the Template spec known gaps
     - Write ADR 0001 to 0005 (or amend Template spec criteria 4.4, 8.9/10.8, 9.7, 10.1, 8.8) for the five gaps listed in the Template design, and add or update the tests that pin the chosen behavior
     - _Requirements: 1.4, 16.2_
 
-- [ ] 2. Add continuous integration and the traceability seed
-  - [ ] 2.1 Create `.github/workflows/ci.yml`
+- [x] 2. Add continuous integration and the traceability seed
+  - [x] 2.1 Create `.github/workflows/ci.yml`
     - Matrix ubuntu and macos, Python 3.10 and newest 3.x; run `scripts/validate.sh` and `HYPOTHESIS_PROFILE=ci scripts/test-properties.sh`
     - `permissions: contents: read`; every action pinned by full SHA with a version comment
     - Add a validator test that parses the workflow and rejects unpinned actions or broader permissions without a justification comment
     - _Requirements: 2.1, 2.2, 2.3, 2.5_
-  - [ ] 2.2 Create `.github/workflows/integration.yml`
+  - [x] 2.2 Create `.github/workflows/integration.yml`
     - Manual and weekly triggers only; skip for fork pull requests; runs `HARNESS_INTEGRATION=1` suite; not a required check
     - _Requirements: 2.4_
-  - [ ] 2.3 Retro-tag existing tests
+  - [x] 2.3 Retro-tag existing tests
     - Add Validates_Tags to every test in `tests/hooks`, `tests/validator`, `tests/property`, using the Template tasks' "Validates" lines and design property mapping
     - Write a temporary script that lists Template criteria with no tag; record the list in `docs/IMPLEMENTATION_STATUS.md` as the coverage backlog for Task 21
     - _Requirements: 14.2_
-  - [ ] 2.4 Document CI
+  - [x] 2.4 Document CI
     - README status badge; Customization_Guide section "Enable, change, or remove CI" replacing the current sample-only text
     - _Requirements: 2.6_
 
-- [ ] 3. Checkpoint: Phase 0
+- [x] 3. Checkpoint: Phase 0
   - Validation_Command and property suite pass locally and in CI; zero warnings; status doc updated; tag release 0.2.0
   - _Requirements: 1.1, 1.3, 2.1_
 

@@ -346,28 +346,27 @@ To get update pull requests from Renovate, add a regex manager such as:
 
 ## Continuous Integration
 
-This example GitHub Actions workflow is not enabled by default. Save it as
-`.github/workflows/harness.yml` to run the checks on every push:
+The Template ships two GitHub Actions workflows in `.github/workflows/`:
 
-```yaml
-name: harness
-on: [push, pull_request]
-jobs:
-  validate:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python: ["3.10", "3.x"]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-      - uses: astral-sh/setup-uv@v6
-      - run: scripts/validate.sh
-      - run: HYPOTHESIS_PROFILE=ci scripts/test-properties.sh
-```
+| Workflow | Runs on | What it does |
+|---|---|---|
+| `ci.yml` | every push and pull request | `scripts/validate.sh`, then the property suite with `HYPOTHESIS_PROFILE=ci`, on Ubuntu and macOS with Python 3.10 and the newest Python 3 |
+| `integration.yml` | manual run and weekly schedule, never pull requests | the networked MCP integration suite with `HARNESS_INTEGRATION=1` |
+
+Both workflows grant the job token `contents: read` only and pin every action
+to a full commit SHA with the version in a comment, for example
+`actions/checkout@<sha> # v7.0.1`. `tests/validator/test_ci_workflows.py`
+enforces both rules, so `scripts/validate.sh` fails if a workflow uses a tag
+such as `@v7` or widens permissions without a comment on the line above the
+job's `permissions:` block.
+
+- **Enable:** nothing to do on GitHub; the workflows run once the files are in
+  the default branch. Make `ci` a required status check in branch protection.
+- **Change:** to bump an action, look up the commit SHA of the new release tag
+  and update both the SHA and the version comment. Keep `ci.yml` offline.
+- **Remove:** delete the workflow file and the matching assertions in
+  `tests/validator/test_ci_workflows.py`. The local Git hooks in `.githooks/`
+  stay available but can be bypassed, so keep some server-side check.
 
 ## Manual Integration Checklist
 
@@ -382,5 +381,10 @@ Run these checks on the minimum supported Kiro IDE version (see
    `prompt` field names that `quality.py` and `prompt_scan.py` read.
 4. Run `HARNESS_INTEGRATION=1 python3 -m unittest tests.integration.test_mcp_servers`
    to start each pinned MCP server and check its tools and the git server's
-   repository.
+   repository. The git server is started with `--repository .`, which confines
+   it to the workspace only when Kiro starts MCP servers in the workspace root
+   (ADR 0005). If the check shows another working directory, replace `.` with
+   the absolute path of your repository in a user-level MCP configuration
+   (outside the repository) and disable the workspace entry, so no machine
+   path is committed.
 5. Run `scripts/check-mcp-updates.sh` and review newer versions.
