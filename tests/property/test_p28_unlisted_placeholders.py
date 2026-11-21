@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 28: Unlisted placeholders are reported with every file
+# Validates: kiro-agent-harness-template/R13.9
 import re
 import shutil
 import tempfile

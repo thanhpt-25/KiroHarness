@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 8: Steering front matter validation
+# Validates: kiro-agent-harness-template/R2.6, kiro-agent-harness-template/R2.9, kiro-agent-harness-template/R2.10, kiro-agent-harness-template/R2.11, kiro-agent-harness-template/R10.2, kiro-agent-harness-template/R10.3
 import unittest
 
 from hypothesis import given, strategies as st

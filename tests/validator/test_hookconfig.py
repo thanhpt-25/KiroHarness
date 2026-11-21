@@ -1,4 +1,5 @@
 """Hook_Config_Parser read errors (Requirements 9.3, 9.5)."""
+# Validates: kiro-agent-harness-template/R9.3, kiro-agent-harness-template/R9.5
 
 import os
 import tempfile

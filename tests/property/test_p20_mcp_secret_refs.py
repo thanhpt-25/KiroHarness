@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 20: Credential values in MCP env must be Secret_References
+# Validates: kiro-agent-harness-template/R8.3
 import unittest
 
 from hypothesis import given, strategies as st

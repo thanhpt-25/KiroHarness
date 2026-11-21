@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 23: Env example covers every Secret_Reference
+# Validates: kiro-agent-harness-template/R8.6, kiro-agent-harness-template/R8.10
 import unittest
 
 from hypothesis import given, strategies as st

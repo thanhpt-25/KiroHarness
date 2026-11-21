@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 10: Destructive guard agrees with the reference matcher
+# Validates: kiro-agent-harness-template/R4.2, kiro-agent-harness-template/R4.3
 import io
 import tempfile
 import unittest

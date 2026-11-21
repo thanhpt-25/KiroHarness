@@ -1,4 +1,5 @@
 """Template hook rules (Requirements 3.1, 3.4, 10.5)."""
+# Validates: kiro-agent-harness-template/R3.1, kiro-agent-harness-template/R3.4, kiro-agent-harness-template/R10.5
 
 import json
 import os

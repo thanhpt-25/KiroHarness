@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 6: Every hook rule violation is reported with its field path
+# Validates: kiro-agent-harness-template/R3.1, kiro-agent-harness-template/R3.2, kiro-agent-harness-template/R3.3, kiro-agent-harness-template/R3.4, kiro-agent-harness-template/R3.5, kiro-agent-harness-template/R3.6, kiro-agent-harness-template/R3.7, kiro-agent-harness-template/R3.8, kiro-agent-harness-template/R10.4, kiro-agent-harness-template/R10.13
 import json
 import unittest
 

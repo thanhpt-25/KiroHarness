@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 16: Quality hook passes only the saved path
+# Validates: kiro-agent-harness-template/R6.2, kiro-agent-harness-template/R6.3
 import json
 import re
 import unittest

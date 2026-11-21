@@ -5,6 +5,7 @@ Skipped unless HARNESS_INTEGRATION=1. Starts each pinned server through uvx
 autoApprove name exists. For the git server it calls git_status and checks the
 repository it reports.
 """
+# Validates: kiro-agent-harness-template/R8.1, kiro-agent-harness-template/R8.5, kiro-agent-harness-template/R8.8
 
 import json
 import os

@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 18: Output truncation keeps the last 200 lines
+# Validates: kiro-agent-harness-template/R6.6
 import unittest
 
 from hypothesis import given, strategies as st

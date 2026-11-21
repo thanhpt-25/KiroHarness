@@ -1,4 +1,5 @@
 """File_Match_Pattern examples from Requirements 2.3 and 2.4."""
+# Validates: kiro-agent-harness-template/R2.3, kiro-agent-harness-template/R2.4
 
 import unittest
 

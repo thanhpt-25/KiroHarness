@@ -3,6 +3,7 @@
 Sample values are assembled at run time so that no file in the repository
 contains a string that looks like a real credential.
 """
+# Validates: kiro-agent-harness-template/R10.6, kiro-agent-harness-template/R13.10
 
 import unittest
 

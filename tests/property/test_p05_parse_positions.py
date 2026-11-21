@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 5: Parse errors report a 1-based position
+# Validates: kiro-agent-harness-template/R9.3
 import json
 import unittest
 

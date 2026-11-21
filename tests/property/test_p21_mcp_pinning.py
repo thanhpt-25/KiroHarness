@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 21: uvx packages must be pinned to an exact version
+# Validates: kiro-agent-harness-template/R8.4
 import re
 import unittest
 

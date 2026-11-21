@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 24: Every MCP violation is reported
+# Validates: kiro-agent-harness-template/R8.9, kiro-agent-harness-template/R10.7
 import json
 import unittest
 

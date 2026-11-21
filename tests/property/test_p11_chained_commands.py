@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 11: Chained commands block if any segment blocks
+# Validates: kiro-agent-harness-template/R4.6
 import unittest
 
 from hypothesis import given, strategies as st

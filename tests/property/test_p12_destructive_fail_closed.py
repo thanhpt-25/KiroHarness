@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 12: Destructive guard fails closed on malformed input
+# Validates: kiro-agent-harness-template/R4.4, kiro-agent-harness-template/R11.8
 import io
 import json
 import unittest

@@ -1,4 +1,5 @@
 """Validation_Command behavior (Requirements 11.5, 11.6, 11.7)."""
+# Validates: kiro-agent-harness-template/R11.5, kiro-agent-harness-template/R11.6, kiro-agent-harness-template/R11.7
 
 import re
 import unittest

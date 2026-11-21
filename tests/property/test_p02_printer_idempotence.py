@@ -1,4 +1,5 @@
 # Feature: kiro-agent-harness-template, Property 2: Hook printer idempotence
+# Validates: kiro-agent-harness-template/R9.9
 import unittest
 
 from hypothesis import given
