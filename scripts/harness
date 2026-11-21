@@ -1,0 +1,8 @@
+#!/bin/sh
+# Harness command line (sync). Exit 0 ok, 1 findings, 2 usage or internal error.
+dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd) || exit 2
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "harness: python3 not found (Python 3.10 or newer is required)" >&2
+  exit 2
+fi
+exec python3 -I -c 'import sys; sys.path.insert(0, sys.argv.pop(1)); from harness_cli.main import main; sys.exit(main(sys.argv[1:]))' "$dir" "$@"

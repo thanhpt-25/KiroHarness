@@ -12,6 +12,7 @@ changes. Records are numbered and never deleted; a replaced decision is marked
 | [0004](0004-validator-hook-scope.md) | Validator hook scope | Accepted | kiro-agent-harness-template/R10.1 |
 | [0005](0005-git-server-confinement.md) | Git MCP server confinement with `--repository .` | Accepted, pending IDE check | kiro-agent-harness-template/R8.8 |
 | [0006](0006-agent-neutral-core-layout.md) | Agent-neutral core layout and supported agents | Accepted | agent-harness-platform/R4.1, R4.2, R5.1, R9.1 |
+| [0007](0007-generator-design.md) | Generator design and Kiro byte-equivalence | Accepted | agent-harness-platform/R6.1, R6.3, R6.5, R6.8, R7.1, R7.2 |
 
 ## Template
 

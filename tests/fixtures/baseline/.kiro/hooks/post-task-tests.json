@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "post-task-tests",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/post-task-tests.sh"
+      },
+      "timeout": 300,
+      "description": "Runs the test suite once after each spec task."
+    }
+  ]
+}
