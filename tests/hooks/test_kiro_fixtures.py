@@ -9,7 +9,7 @@ without changing this file.
 
 (agent-harness-platform Requirements 3.2 and 3.3)
 """
-# Validates: agent-harness-platform/R3.2, agent-harness-platform/R3.3
+# Validates: agent-harness-platform/R3.2, agent-harness-platform/R3.3, agent-harness-platform/R9.2
 
 import json
 import unittest

@@ -3,7 +3,7 @@
 Matching calls come from the "# example:" comment above each entry in
 risky-tools.conf, read at run time.
 """
-# Validates: kiro-agent-harness-template/R5.2, kiro-agent-harness-template/R5.3, kiro-agent-harness-template/R5.4, kiro-agent-harness-template/R5.5, kiro-agent-harness-template/R5.6, kiro-agent-harness-template/R5.7, kiro-agent-harness-template/R5.8, kiro-agent-harness-template/R11.3, kiro-agent-harness-template/R11.4, kiro-agent-harness-template/R11.8
+# Validates: kiro-agent-harness-template/R5.2, kiro-agent-harness-template/R5.3, kiro-agent-harness-template/R5.4, kiro-agent-harness-template/R5.5, kiro-agent-harness-template/R5.6, kiro-agent-harness-template/R5.7, kiro-agent-harness-template/R5.8, kiro-agent-harness-template/R11.3, kiro-agent-harness-template/R11.4, kiro-agent-harness-template/R11.8, agent-harness-platform/R5.2
 
 import json
 import shutil

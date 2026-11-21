@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 
@@ -28,6 +29,8 @@ def build_parser() -> argparse.ArgumentParser:
     log.add_argument("--summary", action="store_true", required=True, help="count each Decision per guard and the ten most frequent matched entries")
     new = sub.add_parser("new-spec", help="create .kiro/specs/<name>/ with a skeleton that passes the Spec_Linter")
     new.add_argument("name", help="spec name: lowercase letters, digits and hyphens")
+    trace = sub.add_parser("trace", help="print the Traceability_Report and write build/traceability.json")
+    trace.add_argument("--json", action="store_true", help="print the JSON report instead of Markdown")
     return parser
 
 
@@ -37,6 +40,17 @@ def main(argv, out=None, err=None) -> int:
         args = build_parser().parse_args(argv)
     except SystemExit as exc:
         return 2 if exc.code else 0
+    if args.command == "trace":
+        from harness_validator import trace_check
+
+        report = trace_check.build_report(args.root, trace_check.load_results(args.root))
+        target = os.path.join(args.root, "build", "traceability.json")
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "w", encoding="utf-8") as handle:
+            json.dump(report, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        out.write(json.dumps(report, indent=2, sort_keys=True) + "\n" if args.json else trace_check.markdown(report))
+        return 1 if report["uncovered"] or report["dangling"] else 0
     if args.command == "new-spec":
         from . import specs
 

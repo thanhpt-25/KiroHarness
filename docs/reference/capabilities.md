@@ -24,7 +24,7 @@ Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks),
 - Claude Code: on_save and post_task quality hooks are Kiro-specific and are not rendered for Claude Code.
 - GitHub Copilot: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
 - Cursor: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
-- Kiro IDE: Kiro file read and write tool IDs are not yet recorded, so protected-path checks cover shell and delete tools only. Import payloads with scripts/import-payloads.sh and extend tool_map.
+- Kiro IDE: Kiro read and write tool IDs (fs_read, read_file, fs_write, write_file) are assumed from the documentation and not yet recorded from a real IDE, so protected-path checks for file tools are unverified. Import payloads with scripts/import-payloads.sh and correct tool_map.
 
 ## Verification
 

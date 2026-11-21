@@ -75,7 +75,7 @@
       "sources": ["harness/guidance/testing.md"]
     },
     "docs/reference/capabilities.md": {
-      "sha256": "545e06cf294ac2d3c6310608c608dd95467f2e7b8273b2b2820da0034c9742d6",
+      "sha256": "42e101f6ccf999f6ca73710605f71b744a3cfd4614f028e34e2b2d08bd145c4a",
       "sources": ["harness/capabilities.json"]
     }
   }

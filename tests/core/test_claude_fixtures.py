@@ -1,5 +1,5 @@
 """Claude Code payloads through the real ``harness/bin/guard`` wrapper (agent-harness-platform R8.4)."""
-# Validates: agent-harness-platform/R8.4
+# Validates: agent-harness-platform/R8.4, agent-harness-platform/R9.2
 import json
 import unittest
 

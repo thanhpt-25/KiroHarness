@@ -1,5 +1,5 @@
 """Capability_Matrix validator checks (agent-harness-platform R9.1, R9.5)."""
-# Validates: agent-harness-platform/R9.1, agent-harness-platform/R9.5
+# Validates: agent-harness-platform/R9.1, agent-harness-platform/R9.5, agent-harness-platform/R9.4
 import copy
 import datetime
 import json

@@ -1,5 +1,5 @@
 """`harness sync` behavior (agent-harness-platform R6.2 to R6.7, R7.1 to R7.3, R7.5)."""
-# Validates: agent-harness-platform/R6.2, agent-harness-platform/R6.4, agent-harness-platform/R6.5, agent-harness-platform/R6.6, agent-harness-platform/R6.7, agent-harness-platform/R7.1, agent-harness-platform/R7.2, agent-harness-platform/R7.3, agent-harness-platform/R7.5
+# Validates: agent-harness-platform/R6.2, agent-harness-platform/R6.4, agent-harness-platform/R6.5, agent-harness-platform/R6.6, agent-harness-platform/R6.7, agent-harness-platform/R7.1, agent-harness-platform/R7.2, agent-harness-platform/R7.3, agent-harness-platform/R7.5, agent-harness-platform/R7.4, agent-harness-platform/R9.3
 import copy
 import json
 import unittest
@@ -156,6 +156,27 @@ class Sync(unittest.TestCase):
             (root / ".kiro/steering/tech.md").write_text("changed\n")
             drift = [f for f in generator_checks.check_generated(root)[0] if f.rule == "DRIFT"]
             self.assertEqual([f.path for f in drift], [".kiro/steering/tech.md"])
+
+
+    def test_steering_rules_apply_to_sources_not_generated_files(self):
+        from harness_validator.__main__ import validate
+
+        with SourceRoot() as root:
+            pass
+        from tests._support import TemplateCopy, errors
+
+        with TemplateCopy() as root:
+            (root / "harness/guidance/tech.md").write_text("no front matter here\n")
+            found = errors(validate(root)[0])
+            self.assertTrue(any(f.path == "harness/guidance/tech.md" and f.rule.startswith("STEER") for f in found), found)
+            self.assertFalse(any(f.path.startswith(".kiro/steering/") and f.rule.startswith("STEER") for f in found))
+
+    def test_protection_levels_are_listed_per_agent_and_guard(self):
+        with SourceRoot(ALL) as root:
+            run_cli(root, "sync")
+            text = (root / "docs/reference/capabilities.md").read_text()
+        self.assertIn("| Kiro IDE | documented | enforced | enforced | enforced | partial |", text)
+        self.assertIn("| Cursor | unverified | guidance-only | guidance-only | guidance-only | guidance-only |", text)
 
 
 if __name__ == "__main__":

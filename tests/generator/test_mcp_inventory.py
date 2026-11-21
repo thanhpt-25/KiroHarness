@@ -1,5 +1,5 @@
 """MCP tool inventories and validator checks (agent-harness-platform R10.2 to R10.4, R10.6)."""
-# Validates: agent-harness-platform/R10.2, agent-harness-platform/R10.3, agent-harness-platform/R10.4, agent-harness-platform/R10.6
+# Validates: agent-harness-platform/R10.2, agent-harness-platform/R10.3, agent-harness-platform/R10.4, agent-harness-platform/R10.6, agent-harness-platform/R9.4
 import copy
 import io
 import json
