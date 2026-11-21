@@ -1,0 +1,41 @@
+# Offline checks on every push and pull request.
+# Spec: .kiro/specs/agent-harness-platform/requirements.md, Requirement 2.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.x"]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Config validator and unit tests
+        run: sh scripts/validate.sh
+      - name: Install dev dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Property tests (ci profile)
+        env:
+          HARNESS_OFFLINE: "1"
+          HYPOTHESIS_PROFILE: ci
+        run: sh scripts/test-properties.sh
