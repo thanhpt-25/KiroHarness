@@ -12,10 +12,10 @@ import time
 import unittest
 from pathlib import Path
 
-from tests._support import HOOK_SCRIPTS, detail, run_script, tool_call
+from tests._support import HOOK_SCRIPTS, POLICY, TemplateCopy, detail, run_script, tool_call
 
 SCRIPT = HOOK_SCRIPTS / "risky-tool-guard.sh"
-LIST = HOOK_SCRIPTS / "risky-tools.conf"
+LIST = POLICY / "risky-tools.conf"
 
 NON_MATCHING = [
     ("read_file", {"path": "README.md"}),
@@ -86,21 +86,16 @@ class RiskyGuard(unittest.TestCase):
                 self.assertIn("could not be parsed", output["permissionDecisionReason"])
                 self.assertIn("parse error", result.stderr.decode())
 
-    def _copy_scripts(self, tmp):
-        scripts = Path(tmp) / "scripts"
-        shutil.copytree(HOOK_SCRIPTS, scripts, ignore=shutil.ignore_patterns("__pycache__"))
-        return scripts
-
     def test_malformed_list_asks_and_names_the_file(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            scripts = self._copy_scripts(tmp)
-            (scripts / "risky-tools.conf").write_text("delete_file has no separators\n")
-            result = run_script(scripts / "risky-tool-guard.sh", tool_call("read_file", {"path": "a"}))
+        with TemplateCopy() as root:
+            conf = root / "harness/policy/risky-tools.conf"
+            conf.write_text("delete_file has no separators\n")
+            result = run_script(root / ".kiro/hooks/scripts/risky-tool-guard.sh", tool_call("read_file", {"path": "a"}), cwd=root)
             self.assertEqual(result.returncode, 0)
             output = decision(result.stdout)
             self.assertEqual(output["permissionDecision"], "ask")
-            self.assertIn(str(scripts / "risky-tools.conf"), output["permissionDecisionReason"])
-            self.assertIn(str(scripts / "risky-tools.conf"), result.stderr.decode())
+            self.assertIn(str(conf), output["permissionDecisionReason"])
+            self.assertIn(str(conf), result.stderr.decode())
 
     def test_extra_entry_adds_one_generated_case(self):
         with tempfile.TemporaryDirectory() as tmp:

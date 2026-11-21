@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from hookio import HookInputError, read_hook_input  # noqa: E402
 
 NAME = "risky-tool-guard"
-DEFAULT_LIST = Path(__file__).resolve().parent.parent / "risky-tools.conf"
+DEFAULT_LIST = Path(__file__).resolve().parent.parent / "policy" / "risky-tools.conf"
 _SPLIT_RE = re.compile(r"\s+\|\s+")
 
 

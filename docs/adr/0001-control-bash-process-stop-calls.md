@@ -30,5 +30,5 @@ agent can do.
 ## Verification
 
 `tests/hooks/test_destructive_guard.py` covers the stop call and the
-missing-command block; `.kiro/hooks/scripts/lib/destructive_guard.py` holds the
+missing-command block; `harness/core/destructive_guard.py` holds the
 exception.

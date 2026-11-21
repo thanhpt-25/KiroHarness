@@ -13,9 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = ROOT / "scripts"
 HOOK_SCRIPTS = ROOT / ".kiro" / "hooks" / "scripts"
-LIB = HOOK_SCRIPTS / "lib"
+CORE = ROOT / "harness" / "core"
+LIB = CORE  # historical name
+POLICY = ROOT / "harness" / "policy"
 
-for _path in (str(SCRIPTS), str(LIB)):
+for _path in (str(SCRIPTS), str(CORE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 

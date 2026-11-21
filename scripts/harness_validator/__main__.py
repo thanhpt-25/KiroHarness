@@ -18,9 +18,9 @@ from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
 CONFIG_PATH = "scripts/validator-config.json"
-LIB_DIR = ".kiro/hooks/scripts/lib"
-DESTRUCTIVE_LIST = ".kiro/hooks/scripts/destructive-commands.txt"
-RISKY_LIST = ".kiro/hooks/scripts/risky-tools.conf"
+LIB_DIR = "harness/core"
+DESTRUCTIVE_LIST = "harness/policy/destructive-commands.txt"
+RISKY_LIST = "harness/policy/risky-tools.conf"
 RISKY_SCRIPT = "risky-tool-guard.sh"
 README = "README.md"
 
@@ -93,7 +93,7 @@ def _json_pairs(text: str):
 
 
 def load_lib_module(root: Path, name: str):
-    """Load a guard module from .kiro/hooks/scripts/lib so parsing logic is shared."""
+    """Load a guard module from harness/core so parsing logic is shared."""
     lib = root / LIB_DIR
     path = lib / f"{name}.py"
     if not path.is_file():

@@ -17,7 +17,7 @@ from hookio import HookInputError, read_hook_input  # noqa: E402
 
 NAME = "destructive-command-guard"
 MAX_PATTERNS = 200
-DEFAULT_LIST = Path(__file__).resolve().parent.parent / "destructive-commands.txt"
+DEFAULT_LIST = Path(__file__).resolve().parent.parent / "policy" / "destructive-commands.txt"
 _SEPARATORS = re.compile(r"&&|\|\||;|\||\n")
 _EDGE_CHARS = "'\"`()"
 
