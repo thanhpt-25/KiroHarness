@@ -21,6 +21,9 @@ def build_parser() -> argparse.ArgumentParser:
     sync = sub.add_parser("sync", help="render every Generated_File from the Manifest and sources")
     sync.add_argument("--check", action="store_true", help="write nothing; exit 1 with a diff when files drifted")
     sync.add_argument("--force", action="store_true", help="overwrite files that were edited by hand")
+    inv = sub.add_parser("mcp-inventory", help="write or compare tool inventories of the pinned MCP servers (starts the servers; needs uvx and network)")
+    inv.add_argument("--check", action="store_true", help="compare live tools with harness/mcp/*.tools.json; exit 1 on any difference")
+    inv.add_argument("--server", action="append", help="limit to this server (repeatable)")
     return parser
 
 
@@ -39,6 +42,12 @@ def main(argv, out=None, err=None) -> int:
     except Exception as exc:  # an internal error must not look like drift
         err.write(f"harness: internal error: {exc.__class__.__name__}: {exc}\n")
         return 2
+    if args.command == "mcp-inventory":
+        from . import mcp_inventory
+        from harness_validator import manifest as manifest_mod
+
+        servers = manifest_mod.load(args.root)["mcp"]
+        return mcp_inventory.run(args.root, servers, args.server, args.check, out)
     for warning in plan.warnings:
         err.write(f"warning: {warning}\n")
     if args.command == "sync":

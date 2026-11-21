@@ -190,6 +190,33 @@ def check_mcp_file(run: Run, config) -> None:
     run.guarded("secret scan", MCP_PATH, _secret_findings, MCP_PATH, _json_pairs(text), config.secret_patterns)
 
 
+def check_native_mcp_files(run: Run, config) -> None:
+    """Rendered MCP files for other Agents get the same pin, secret and scope checks (R10.1, R10.6)."""
+    path = run.root / ".mcp.json"
+    if config is None or not path.is_file():
+        return
+    run.files.add(".mcp.json")
+    text, problem = _read_text(path)
+    if text is None:
+        run.findings.append(error(".mcp.json", "-", "MCP-JSON", problem))
+        return
+    env_example = None
+    env_path = run.root / ".env.example"
+    if env_path.is_file():
+        env_text, _ = _read_text(env_path)
+        if env_text is not None:
+            env_example = envfile.parse_env_example(env_text)
+    run.guarded("mcp", ".mcp.json", mcp.check_mcp, ".mcp.json", text, env_example, config, True)
+    run.guarded("secret scan", ".mcp.json", _secret_findings, ".mcp.json", _json_pairs(text), config.secret_patterns)
+
+
+def check_inventories(run: Run) -> list:
+    """autoApprove entries must exist in the server's tool inventory when one is recorded (R10.4)."""
+    from harness_cli import mcp_inventory
+
+    return mcp_inventory.check_auto_approve(run.root)
+
+
 def check_generator(run: Run) -> None:
     if not (run.root / "harness/manifest.json").is_file():
         return  # a project that does not use the Generator has no Manifest
@@ -375,6 +402,8 @@ def validate_full(root) -> tuple:
     check_steering_files(run, patterns)
     check_hook_files(run, patterns)
     check_mcp_file(run, config)
+    check_native_mcp_files(run, config)
+    run.guarded("mcp inventory", "harness/mcp", check_inventories, run)
     check_verification_records(run)
     run.guarded("destructive list", DESTRUCTIVE_LIST, check_destructive_list, run)
     run.guarded("risky list", RISKY_LIST, check_risky_list, run)

@@ -16,7 +16,7 @@ class Sync(unittest.TestCase):
             code, _out, _err = run_cli(root, "sync")
             self.assertEqual(code, 0)
             files = set(snapshot(root)) - {"harness/manifest.json", "harness/manifest.schema.json"}
-            self.assertTrue(all(f.startswith((".kiro/", "harness/")) for f in files), files)
+            self.assertTrue(all(f.startswith((".kiro/", "harness/", "docs/reference/")) for f in files), files)
             self.assertIn(".kiro/settings/mcp.json", files)
             self.assertNotIn("AGENTS.md", files)
             lock = json.loads((root / "harness/generated.lock.json").read_text())

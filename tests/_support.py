@@ -29,13 +29,13 @@ def detail(input_value, expected, actual) -> str:
     return f"input: {input_value!r}\nexpected: {expected}\nactual: {actual}"
 
 
-def run_script(script, stdin: bytes = b"", env=None, cwd=None, timeout: float = 30):
+def run_script(script, stdin: bytes = b"", env=None, cwd=None, timeout: float = 30, args=()):
     """Run a shell script with ``sh`` and return the CompletedProcess (bytes)."""
     full_env = dict(os.environ)
     if env:
         full_env.update(env)
     return subprocess.run(
-        ["sh", str(script)],
+        ["sh", str(script), *args],
         input=stdin,
         capture_output=True,
         env=full_env,

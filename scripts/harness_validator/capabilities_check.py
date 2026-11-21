@@ -8,6 +8,7 @@ import json
 from .report import error, warning
 
 REQUIRED = ("label", "status", "events", "output", "tool_map", "tool_prefix_map", "mcp", "protection", "gaps")
+GUIDANCE_ONLY = ("label", "status", "guidance", "protection", "gaps")  # entries with "hooks": false
 STATUSES = ("documented", "verified", "unverified")
 STALE_DAYS = 180
 
@@ -23,7 +24,7 @@ def check_capabilities(path: str, text: str, today: datetime.date | None = None)
         return [error(path, "agents", "CAP-FIELD", "agents must be a non-empty object")]
     findings = []
     for name, entry in agents.items():
-        for key in REQUIRED:
+        for key in (REQUIRED if entry.get("hooks", True) else GUIDANCE_ONLY):
             if key not in entry:
                 findings.append(error(path, f"agents.{name}.{key}", "CAP-FIELD", f"{key} is missing"))
         if entry.get("status") not in STATUSES:

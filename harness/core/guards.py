@@ -121,11 +121,13 @@ GUARDS = {
 }
 
 
-def guards_for(trigger: str) -> tuple:
-    return GUARDS.get(trigger, ())
+def guards_for(trigger: str, only=None) -> tuple:
+    """Guards for ``trigger``; ``only`` (guard names) narrows the set, as the Manifest does."""
+    found = GUARDS.get(trigger, ())
+    return tuple(g for g in found if g[0] in only) if only is not None else found
 
 
-def run_guards(trigger: str, event, error, root=None, failure=None) -> list:
+def run_guards(trigger: str, event, error, root=None, failure=None, only=None) -> list:
     """Evaluate every guard for ``trigger`` and return one Decision per guard.
 
     ``event`` is the decoded Harness_Event, or None when decoding failed with
@@ -135,7 +137,7 @@ def run_guards(trigger: str, event, error, root=None, failure=None) -> list:
     gets its failure Decision, never an allow.
     """
     decisions = []
-    for name, loader in guards_for(trigger):
+    for name, loader in guards_for(trigger, only):
         if event is None:
             decisions.append(failure(name, f"hook input could not be parsed: {error}"))
             continue

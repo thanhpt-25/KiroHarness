@@ -65,6 +65,10 @@
     ".kiro/steering/testing.md": {
       "sha256": "1f29f0fb6c36bfb92191d46e1cc218bcc5088f954c1fbac18601a739e6ea6538",
       "sources": ["harness/guidance/testing.md"]
+    },
+    "docs/reference/capabilities.md": {
+      "sha256": "e8e38302c7de63e425030a3cfcc6be1d40c91b661284c494164bafd9c3caa2b1",
+      "sources": ["harness/capabilities.json"]
     }
   }
 }

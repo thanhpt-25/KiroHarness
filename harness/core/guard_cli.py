@@ -1,6 +1,6 @@
 """Combined guard entry point for every Agent.
 
-Usage: ``python3 -I guard_cli.py <agent> <trigger>`` with the native hook payload
+Usage: ``python3 -I guard_cli.py <agent> <trigger> [--only <guard>,...]`` with the native hook payload
 on standard input. The Agent's Adapter decodes the payload into a
 Harness_Event, every guard for the trigger evaluates it, the Decisions are
 combined (first deny, then first ask, then allow), and the Adapter encodes the
@@ -24,31 +24,35 @@ from hookio import workspace_root  # noqa: E402
 NAME = "harness-guard"
 
 
-def run(agent: str, trigger: str, raw: bytes, root=None):
+def run(agent: str, trigger: str, raw: bytes, root=None, only=None):
     """Return ``(exit_code, stdout, stderr)`` for one hook invocation."""
     root = Path(root) if root else workspace_root()
     try:
         adapter = get_adapter(agent, root)
     except CapabilityError as exc:
         return 2, "", f"{NAME}: {exc}; blocking because the payload cannot be decoded safely\n"
-    if trigger not in TRIGGERS or not guards_for(trigger):
+    if trigger not in TRIGGERS or not guards_for(trigger, only):
         return 0, "", ""
     event, error = None, None
     try:
         event = adapter.decode(raw, trigger)
     except DecodeError as exc:
         error = str(exc)
-    decisions = run_guards(trigger, event, error, root, adapter.failure)
+    decisions = run_guards(trigger, event, error, root, adapter.failure, only)
     out = adapter.encode(combine(decisions), trigger)
     return out.exit_code, out.stdout, out.stderr
 
 
 def main(argv, stdin, stdout, stderr) -> int:
+    only = None
+    if len(argv) == 4 and argv[2] == "--only":
+        only = [name for name in argv[3].split(",") if name]
+        argv = argv[:2]
     if len(argv) != 2:
-        stderr.write(f"{NAME}: usage: guard_cli.py <agent> <trigger>\n")
+        stderr.write(f"{NAME}: usage: guard_cli.py <agent> <trigger> [--only <guard>,<guard>]\n")
         return 2
     raw = stdin.read(MAX_INPUT_BYTES + 1)
-    code, out, err = run(argv[0], argv[1], raw)
+    code, out, err = run(argv[0], argv[1], raw, only=only)
     stdout.write(out)
     stderr.write(err)
     return code

@@ -1,5 +1,6 @@
 # Feature: agent-harness-platform, Property 37: Hand-edit protection
 # Validates: agent-harness-platform/R6.6
+import json
 import unittest
 
 from hypothesis import HealthCheck, given, settings, strategies as st
@@ -16,8 +17,7 @@ class HandEditProtection(unittest.TestCase):
         cls._source = SourceRoot(MANIFEST)
         cls.root = cls._source.__enter__()
         assert run_cli(cls.root, "sync")[0] == 0
-        cls.lock_paths = sorted(p for p in snapshot(cls.root) if p not in {"harness/manifest.json", "harness/manifest.schema.json"}
-                                and not p.startswith("harness/guidance/") and not p.startswith("harness/kiro/") and p != "harness/generated.lock.json")
+        cls.lock_paths = sorted(json.loads((cls.root / "harness/generated.lock.json").read_text())["files"])
 
     @classmethod
     def tearDownClass(cls):

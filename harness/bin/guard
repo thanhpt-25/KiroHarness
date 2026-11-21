@@ -1,5 +1,5 @@
 #!/bin/sh
-# Combined guard entry for any Agent: harness/bin/guard <agent> <trigger>
+# Combined guard entry for any Agent: harness/bin/guard <agent> <trigger> [--only <guard>,<guard>]
 # Reads the native hook payload on stdin. Exit 2 blocks; "ask" is JSON on stdout.
 # Fails closed (exit 2) when python3 is missing or this script cannot be located.
 dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd) || {

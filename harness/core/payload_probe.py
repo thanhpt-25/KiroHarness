@@ -80,14 +80,20 @@ def write_record(text: str, trigger: str, root: Path, now=None) -> Path:
 VERSION_RE = re.compile(r"^[0-9A-Za-z][0-9A-Za-z._-]{0,31}$")
 
 
-def fixture_dir(root: Path, version: str) -> Path:
-    return root / "tests" / "fixtures" / "payloads" / "kiro" / version
+AGENT_RE = re.compile(r"^[a-z][a-z0-9-]{0,31}$")
 
 
-def import_records(root: Path, version: str, patterns, stdout, stderr) -> int:
+def fixture_dir(root: Path, version: str, agent: str = "kiro") -> Path:
+    return root / "tests" / "fixtures" / "payloads" / agent / version
+
+
+def import_records(root: Path, version: str, patterns, stdout, stderr, agent: str = "kiro") -> int:
     """Copy probe records into the fixture tree. Return the process exit code."""
     if not VERSION_RE.match(version):
-        stderr.write(f"{NAME}: invalid Kiro version {version!r}\n")
+        stderr.write(f"{NAME}: invalid version {version!r}\n")
+        return 2
+    if not AGENT_RE.match(agent):
+        stderr.write(f"{NAME}: invalid agent {agent!r}\n")
         return 2
     source = probe_dir(root)
     records = sorted(source.glob("*/*.json")) if source.is_dir() else []
@@ -104,26 +110,29 @@ def import_records(root: Path, version: str, patterns, stdout, stderr) -> int:
             skipped += 1
             continue
         text = sanitize(text.encode("utf-8"), patterns, root, os.environ.get("HOME"))
-        target = fixture_dir(root, version) / record.parent.name / record.name
+        target = fixture_dir(root, version, agent) / record.parent.name / record.name
         if target.exists():
             skipped += 1
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8")
         copied += 1
-    stdout.write(f"{NAME}: imported {copied} record(s) into {fixture_dir(root, version)}; skipped {skipped}\n")
+    stdout.write(f"{NAME}: imported {copied} record(s) into {fixture_dir(root, version, agent)}; skipped {skipped}\n")
     return 0
 
 
 def main(argv, stdin, stderr, root=None, config_path=None, home=None, stdout=None) -> int:
     root = Path(root) if root else workspace_root()
+    agent = "kiro"
+    if len(argv) == 4 and argv[0] == "--import" and argv[2] == "--agent":
+        argv, agent = argv[:2], argv[3]
     if len(argv) == 2 and argv[0] == "--import":
         try:
             patterns = load_patterns(Path(config_path) if config_path else default_config_path())
         except PatternLoadError as exc:
             stderr.write(f"{NAME}: {exc}\n")
             return 2
-        return import_records(root, argv[1], patterns, stdout or sys.stdout, stderr)
+        return import_records(root, argv[1], patterns, stdout or sys.stdout, stderr, agent)
     if len(argv) != 1 or not TRIGGER_RE.match(argv[0]):
         stderr.write(f"{NAME}: usage: payload_probe.py <TriggerName>; nothing recorded\n")
         return 0

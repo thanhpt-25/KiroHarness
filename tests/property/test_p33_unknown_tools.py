@@ -11,9 +11,9 @@ import adapters
 import event_model
 import guards
 
-COMMAND_FIELDS = {m["command"] for a in CAPS["agents"].values() for m in a["tool_map"].values() if "command" in m}
+COMMAND_FIELDS = {m["command"] for a in CAPS["agents"].values() for m in a.get("tool_map", {}).values() if "command" in m}
 names = st.text(alphabet=string.ascii_letters + "_", min_size=1, max_size=12).filter(
-    lambda n: all(n not in a["tool_map"] and not any(n.startswith(p) for p in a["tool_prefix_map"]) for a in CAPS["agents"].values())
+    lambda n: all(n not in a["tool_map"] and not any(n.startswith(p) for p in a["tool_prefix_map"]) for a in CAPS["agents"].values() if "tool_map" in a)
 )
 
 
