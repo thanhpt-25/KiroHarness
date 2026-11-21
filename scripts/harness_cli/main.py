@@ -31,6 +31,14 @@ def build_parser() -> argparse.ArgumentParser:
     new.add_argument("name", help="spec name: lowercase letters, digits and hyphens")
     trace = sub.add_parser("trace", help="print the Traceability_Report and write build/traceability.json")
     trace.add_argument("--json", action="store_true", help="print the JSON report instead of Markdown")
+    doctor = sub.add_parser("doctor", help="report runtime, enabled Agents and their protection levels, drift and Decision_Log status")
+    init = sub.add_parser("init", help="install the Harness into another repository")
+    init.add_argument("target", help="directory of the repository to install into")
+    init.add_argument("--agents", default="kiro", help="comma-separated Agents to enable (default: kiro)")
+    init.add_argument("--force", action="store_true", help="overwrite existing files")
+    upgrade = sub.add_parser("upgrade", help="update an installed Harness from a newer checkout, keeping your edits")
+    upgrade.add_argument("--from", dest="source", required=True, help="directory of the newer Harness checkout")
+    upgrade.add_argument("--target", default=None, help="repository to upgrade (default: --root)")
     return parser
 
 
@@ -52,6 +60,19 @@ def main(argv, out=None, err=None) -> int:
         out.write(json.dumps(report, indent=2, sort_keys=True) + "\n" if args.json else trace_check.markdown(report))
         errors = [f for f in trace_check.check(args.root) if f.severity.value == "error"]
         return 1 if errors else 0
+    if args.command == "init":
+        from . import install
+
+        agents = [a.strip() for a in args.agents.split(",") if a.strip()]
+        return install.init(args.root, os.path.abspath(args.target), agents, args.force, out, err)
+    if args.command == "upgrade":
+        from . import install
+
+        return install.upgrade(os.path.abspath(args.source), os.path.abspath(args.target or args.root), out, err)
+    if args.command == "doctor":
+        from . import doctor
+
+        return doctor.run(args.root, out, err)
     if args.command == "new-spec":
         from . import specs
 

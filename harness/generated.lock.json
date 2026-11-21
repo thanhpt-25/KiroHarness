@@ -51,7 +51,7 @@
       "sources": ["harness/guidance/product.md"]
     },
     ".kiro/steering/release-checklist.md": {
-      "sha256": "4801ef1784381b603aca7be2452f3736b48574d6003aa8759005901ffc3599c2",
+      "sha256": "27de7e986bc470a5efdf65b700a42ce763c6b039436762873a544ec410281672",
       "sources": ["harness/guidance/release-checklist.md"]
     },
     ".kiro/steering/security.md": {

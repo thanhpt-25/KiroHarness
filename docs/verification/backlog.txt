@@ -6,17 +6,6 @@ agent-harness-platform/R1.4
 agent-harness-platform/R14.3
 agent-harness-platform/R14.4
 agent-harness-platform/R15.5
-agent-harness-platform/R16.1
-agent-harness-platform/R16.2
-agent-harness-platform/R16.3
-agent-harness-platform/R16.4
-agent-harness-platform/R16.5
-agent-harness-platform/R16.6
-agent-harness-platform/R17.1
-agent-harness-platform/R17.2
-agent-harness-platform/R17.3
-agent-harness-platform/R17.4
-agent-harness-platform/R17.5
 agent-harness-platform/R2.5
 agent-harness-platform/R2.6
 agent-harness-platform/R3.5

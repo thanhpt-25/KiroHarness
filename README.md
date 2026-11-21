@@ -162,6 +162,10 @@ The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook c
 - [Architecture decisions](docs/adr/README.md): recorded design decisions and accepted deviations from the spec.
 - [Platform roadmap spec](.kiro/specs/agent-harness-platform/requirements.md): the plan to extend the harness to other AI coding agents.
 
+## Documentation
+
+Start at [docs/README.md](docs/README.md): a tutorial, how-to guides, reference pages and explanations. Release history is in [CHANGELOG.md](CHANGELOG.md).
+
 ## Placeholders
 
 Replace the following project-specific placeholders before adopting the steering guidance. Notation placeholders used only in this README, specification, or documentation are intentionally examples and do not need replacement.

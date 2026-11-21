@@ -13,7 +13,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from . import capabilities_check, generator_checks, spec_lint, trace_check, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
+from . import capabilities_check, generator_checks, release_checks, spec_lint, trace_check, envfile, hook_rules, hookconfig, mcp, placeholders, report, secrets, steering, verification
 from .report import error, warning
 
 MCP_PATH = ".kiro/settings/mcp.json"
@@ -239,6 +239,10 @@ def check_trace(run: Run) -> list:
     return trace_check.check(str(run.root))
 
 
+def check_release(run: Run) -> list:
+    return release_checks.check(run.root)
+
+
 def check_generator(run: Run) -> None:
     if not (run.root / "harness/manifest.json").is_file():
         return  # a project that does not use the Generator has no Manifest
@@ -444,6 +448,7 @@ def validate_full(root) -> tuple:
     run.guarded("capabilities", "harness/capabilities.json", check_capabilities, run)
     run.guarded("generator", "harness/manifest.json", check_generator, run)
     check_specs(run)
+    run.guarded("release checks", "harness/VERSION", check_release, run)
     run.guarded("traceability", "docs/verification/backlog.txt", check_trace, run)
     run.guarded("placeholder scan", README, check_placeholders, run)
     return run.findings, len(run.files), run.notes

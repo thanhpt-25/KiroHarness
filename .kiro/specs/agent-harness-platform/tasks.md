@@ -300,37 +300,37 @@ Conventions for every task:
 
 ### Phase 6: Documentation and release
 
-- [ ] 24. Documentation restructure
-  - [ ] 24.1 Diataxis layout
+- [x] 24. Documentation restructure
+  - [x] 24.1 Diataxis layout
     - Split README, CUSTOMIZING, PROJECT_OVERVIEW, GIT_HOOKS into tutorials, how-to, reference, and explanation; `docs/README.md` index; redirects or stubs for old paths
     - _Requirements: 16.1_
-  - [ ] 24.2 ADRs for every design decision
+  - [x] 24.2 ADRs for every design decision
     - ADRs for D1 to D8 and the Task 7 Agent decision, each listing affected Criterion_IDs
     - _Requirements: 16.2_
-  - [ ] 24.3 Reference pages and help parity
+  - [x] 24.3 Reference pages and help parity
     - `docs/reference/cli.md` and Policy_File format pages; test that each command's `--help` options match its page
     - _Requirements: 16.3_
-  - [ ] 24.4 Executable examples and link check
+  - [x] 24.4 Executable examples and link check
     - Extend `test_docs_examples.py` to the `example=<target>` forms for guards and the Generator; `docs_links.py` for relative links
     - _Requirements: 16.4, 16.6_
-  - [ ] 24.5 CHANGELOG
+  - [x] 24.5 CHANGELOG
     - `CHANGELOG.md` with entries back to 0.1.0; validator check that `harness/VERSION` has an entry
     - _Requirements: 16.5_
 
-- [ ] 25. Install, upgrade, doctor
-  - [ ] 25.1 Versioning policy
+- [x] 25. Install, upgrade, doctor
+  - [x] 25.1 Versioning policy
     - `harness/VERSION`; ADR on what counts as a major change
     - _Requirements: 17.1_
-  - [ ] 25.2 `harness init`
+  - [x] 25.2 `harness init`
     - Copy, write Manifest with selected Agents, sync, validate; refuse to overwrite without `--force`; tests in a temporary directory with and without an existing git repo
     - _Requirements: 17.2_
-  - [ ] 25.3 `harness upgrade`
+  - [x] 25.3 `harness upgrade`
     - Three-way merge using the lockfile hashes as the base; conflicts reported, files left unchanged; tests with edited and unedited files
     - _Requirements: 17.3_
-  - [ ] 25.4 `harness doctor`
+  - [x] 25.4 `harness doctor`
     - Runtime, Agents, protection levels, drift, log status; non-zero exit on missing required runtime; tests with `PATH` stripped
     - _Requirements: 17.4_
-  - [ ] 25.5 Release checklist
+  - [x] 25.5 Release checklist
     - Update the release-checklist Guidance_Source with the gates in Requirement 17.5; validator test that the checklist names each gate
     - _Requirements: 17.5_
 

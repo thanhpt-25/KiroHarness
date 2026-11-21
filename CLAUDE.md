@@ -15,6 +15,8 @@ Requires Python 3.10+ and POSIX `sh`. All commands run from the repo root.
 ```sh
 scripts/harness sync [--check]       # regenerate Agent files from harness/manifest.json (drift is a validator error)
 scripts/harness trace               # Traceability_Report; writes build/traceability.json
+scripts/harness doctor              # runtime, Agents, protection levels, drift, Decision_Log status
+scripts/harness init <dir> --agents kiro,claude-code   # install into another repo; `upgrade --from <dir>` updates it
 python3 -I evals/run.py [--corpus]  # replay eval scenarios / Bypass_Corpus through every Adapter
 scripts/coverage.sh                 # coverage gate (needs requirements-dev.txt)
 scripts/validate.sh                 # config validator + hook/validator unit tests (offline). Run before finishing.
