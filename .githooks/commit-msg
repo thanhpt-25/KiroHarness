@@ -1,0 +1,25 @@
+#!/bin/sh
+set -u
+
+message_file=${1:-}
+if [ -z "$message_file" ] || [ ! -r "$message_file" ]; then
+  echo "commit-msg: Git did not provide a readable message file" >&2
+  exit 2
+fi
+
+subject=$(sed -n '1p' "$message_file")
+if [ -z "$(printf '%s' "$subject" | tr -d '[:space:]')" ]; then
+  echo "commit-msg: the first line must contain a commit summary" >&2
+  exit 1
+fi
+
+subject_length=$(printf '%s' "$subject" | wc -m | tr -d '[:space:]')
+if [ "$subject_length" -gt 72 ]; then
+  echo "commit-msg: keep the first line to 72 characters or fewer (got $subject_length)" >&2
+  exit 1
+fi
+
+if [ "$subject" != "$(printf '%s' "$subject" | sed 's/[[:space:]]*$//')" ]; then
+  echo "commit-msg: remove trailing whitespace from the first line" >&2
+  exit 1
+fi

@@ -1,0 +1,18 @@
+{
+  "secret_patterns": [
+    {"id": "aws-access-key-id", "regex": "\\b(AKIA|ASIA)[0-9A-Z]{16}\\b"},
+    {"id": "github-token", "regex": "\\bgh[pousr]_[A-Za-z0-9]{36,}\\b"},
+    {"id": "github-fine-grained-pat", "regex": "\\bgithub_pat_[A-Za-z0-9_]{60,}\\b"},
+    {"id": "slack-token", "regex": "\\bxox[abprs]-[A-Za-z0-9-]{10,}"},
+    {"id": "private-key", "regex": "-----BEGIN [A-Z ]*PRIVATE KEY-----"},
+    {"id": "openai-style-key", "regex": "\\bsk-[A-Za-z0-9_-]{20,}"},
+    {"id": "google-api-key", "regex": "\\bAIza[0-9A-Za-z_-]{35}\\b"},
+    {"id": "stripe-live-key", "regex": "\\b[sr]k_live_[A-Za-z0-9]{20,}\\b"},
+    {"id": "generic-assignment", "regex": "(?i)\\b(api[_-]?key|secret|token|password)\\b\\s*[:=]\\s*['\"]?[A-Za-z0-9/+_.-]{16,}"}
+  ],
+  "read_only_allowlist": ["read_documentation", "search_documentation", "recommend",
+                          "git_status", "git_diff_unstaged", "git_diff_staged", "git_diff",
+                          "git_log", "git_show", "git_branch"],
+  "known_mutating_tools": ["git_commit", "git_add", "git_reset", "git_checkout", "git_create_branch"],
+  "mcp_minimum_versions": {"mcp-server-git": "2026.10.28"}
+}

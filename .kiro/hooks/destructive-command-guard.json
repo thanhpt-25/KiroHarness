@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "destructive-command-guard",
+      "trigger": "PreToolUse",
+      "matcher": "^(execute_bash|execute_pwsh|control_bash_process)$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/destructive-guard.sh"
+      },
+      "timeout": 5,
+      "description": "Blocks shell commands on .kiro/hooks/scripts/destructive-commands.txt (exit 2)."
+    }
+  ]
+}

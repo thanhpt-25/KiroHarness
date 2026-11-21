@@ -1,0 +1,21 @@
+#!/bin/sh
+set -u
+
+if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "pre-push: cannot locate the Git repository root" >&2
+  exit 2
+fi
+
+cd "$root" || exit 2
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "pre-push: python3 is required; install Python 3.10 or newer" >&2
+  exit 2
+fi
+
+echo "pre-push: running property tests using installed dependencies only"
+if ! HARNESS_OFFLINE=1 HYPOTHESIS_PROFILE=default sh scripts/test-properties.sh; then
+  echo "pre-push: property tests failed or Hypothesis is not installed" >&2
+  echo "pre-push: install development dependencies with python3 -m pip install -r requirements-dev.txt" >&2
+  exit 1
+fi

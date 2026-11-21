@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "new-file-reminder",
+      "trigger": "PostFileCreate",
+      "matcher": "^src/",
+      "action": {
+        "type": "agent",
+        "prompt": "A new source file was created. Add a matching test file and update structure.md in .kiro/steering/ if the file adds a new module."
+      },
+      "description": "Example hook, disabled. Move it to .kiro/hooks/ and remove enabled: false to use it.",
+      "enabled": false
+    }
+  ]
+}

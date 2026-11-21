@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "risky-tool-guard",
+      "trigger": "PreToolUse",
+      "matcher": "^(delete_file|web_fetch|execute_bash|execute_pwsh|control_bash_process|@git/git_reset|@git/git_commit|@git/git_checkout)$",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/risky-tool-guard.sh"
+      },
+      "timeout": 5,
+      "description": "Asks for confirmation before tool calls on .kiro/hooks/scripts/risky-tools.conf."
+    }
+  ]
+}

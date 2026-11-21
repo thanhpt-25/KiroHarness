@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "pre-compact-snapshot",
+      "trigger": "PreCompact",
+      "action": {
+        "type": "command",
+        "command": "sh .kiro/hooks/scripts/pre-compact-snapshot.sh"
+      },
+      "timeout": 10,
+      "description": "Example hook, disabled. Move it to .kiro/hooks/ and remove enabled: false to use it.",
+      "enabled": false
+    }
+  ]
+}

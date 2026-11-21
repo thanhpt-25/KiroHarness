@@ -1,0 +1,20 @@
+#!/bin/sh
+set -u
+
+if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "pre-commit: cannot locate the Git repository root" >&2
+  exit 2
+fi
+
+cd "$root" || exit 2
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "pre-commit: python3 is required; install Python 3.10 or newer" >&2
+  exit 2
+fi
+
+echo "pre-commit: running harness validation and unit tests"
+if ! sh scripts/validate.sh; then
+  echo "pre-commit: checks failed; fix the reported issues and commit again" >&2
+  exit 1
+fi

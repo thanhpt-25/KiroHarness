@@ -1,0 +1,24 @@
+# Destructive_Command_List, read by destructive-guard.sh on every shell tool call.
+# One pattern per line. Blank lines and lines starting with # are ignored.
+# Matching ignores case and whitespace runs; a command matches when the
+# pattern's words appear in order within one command segment (segments are
+# split on &&, ||, ;, | and newlines). Entries are literal words, not regexes:
+# "dd of=/dev/" only matches a word equal to "of=/dev/". Because case is
+# ignored, "git branch -D" also blocks "git branch -d". Maximum 200 patterns.
+# Run scripts/validate.sh after changing this file.
+rm -rf /
+rm -rf ~
+rm -rf *
+rm -fr /
+git push --force
+git push -f
+git reset --hard
+git clean -fd
+git clean -fdx
+git branch -D
+drop table
+drop database
+truncate table
+mkfs
+dd of=/dev/
+chmod -R 777 /

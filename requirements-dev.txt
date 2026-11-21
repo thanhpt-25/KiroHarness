@@ -1,0 +1,4 @@
+# Dev-only dependencies for the property test suite in tests/property/.
+# The Config_Validator and the Hook_Scripts use only the Python standard library.
+# 6.168.5 is the newest Hypothesis release that still supports Python 3.10.
+hypothesis==6.168.5

@@ -1,0 +1,16 @@
+# Local secrets. Only the documented template, .env.example, is tracked.
+.env
+.env.*
+!.env.example
+
+# Per-developer MCP overrides. The shared .kiro/settings/mcp.json is tracked.
+.kiro/settings/mcp.local.json
+
+# Python and test tooling
+.venv/
+__pycache__/
+*.pyc
+.hypothesis/
+
+# OS files
+.DS_Store
