@@ -1,0 +1,1 @@
+{"session_id":"sess_3451be9e-40a6-4ed8-b225-a59e6b70b47d","hook_event_name":"PreToolUse","cwd":"/WORKSPACE","tool_name":"execute_bash","tool_input":{"command":"grep -n -B25 \"actual: \\['PostToolUse'\\]\" /tmp/validate.log | head -60","description":"Show failing test details","cwd":"/WORKSPACE","run_in_background":false,"timeout":60000}}

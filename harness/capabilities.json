@@ -4,12 +4,12 @@
   "agents": {
     "kiro": {
       "label": "Kiro IDE",
-      "status": "documented",
+      "status": "verified",
       "verified": {
-        "min": "1.1.14",
-        "max": "1.1.14",
+        "min": "1.5.11",
+        "max": "1.5.11",
         "date": "2026-11-21",
-        "source": "Template design research (third-party measurement of exit-code blocking on 1.1.14); IDE smoke test pending, see docs/verification/kiro/RUNBOOK.md"
+        "source": "Manual_Check_Records for Kiro 1.5.11 (Kiro Agent 0.66.123, macOS arm64) in docs/verification/kiro/1.5.11/: 3 pass, 2 partial; 46 recorded payloads in tests/fixtures/payloads/kiro/1.5.11/"
       },
       "guidance": {
         "always": ".kiro/steering/*.md (inclusion: always)",
@@ -101,7 +101,10 @@
         "protected_paths": "partial"
       },
       "gaps": [
-        "Kiro read and write tool IDs (fs_read, read_file, fs_write, write_file) are assumed from the documentation and not yet recorded from a real IDE, so protected-path checks for file tools are unverified. Import payloads with scripts/import-payloads.sh and correct tool_map."
+        "Kiro 1.5.11 payloads confirm the tool IDs execute_bash, read_file and fs_write and their path field. fs_read, write_file and delete_file were not seen in a recording, so protected-path checks for those IDs stay unverified.",
+        "PostTaskExec was not observed on Kiro 1.5.11, so the post-task hook has no recorded payload.",
+        "Risky-tool ask on Kiro 1.5.11 is partial: the guard matched and the call did not run, but nobody confirmed that an approval prompt appeared in the UI (docs/verification/kiro/1.5.11/risky-guard-asks.md).",
+        "Quality-on-save on Kiro 1.5.11 is partial: PostFileSave delivers the saved path, but Kiro showed no hook output after an editor save (docs/verification/kiro/1.5.11/quality-hook-saved-path.md)."
       ],
       "hooks": true
     },

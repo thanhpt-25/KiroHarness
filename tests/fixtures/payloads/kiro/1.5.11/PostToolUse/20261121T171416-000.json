@@ -1,0 +1,1 @@
+{"session_id":"sess_3451be9e-40a6-4ed8-b225-a59e6b70b47d","hook_event_name":"PostToolUse","cwd":"/WORKSPACE","tool_name":"read_file","tool_input":{"path":"/tmp/t.txt","offset":null,"limit":null},"tool_response":"Caught error reading: Path does not exist: /tmp/t.txt"}
