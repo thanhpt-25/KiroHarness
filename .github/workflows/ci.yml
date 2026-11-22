@@ -19,7 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # Self-hosted runner on Neo's Mac: GitHub-hosted jobs are blocked by an account billing problem.
+        # Restore [ubuntu-latest, macos-latest] once billing is fixed.
+        os: [self-hosted]
         python: ["3.10", "3.x"]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -40,5 +42,5 @@ jobs:
           HYPOTHESIS_PROFILE: ci
         run: sh scripts/test-properties.sh
       - name: Coverage gate (90 percent line, 80 percent branch)
-        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.x'
+        if: matrix.python == '3.x'
         run: sh scripts/coverage.sh
