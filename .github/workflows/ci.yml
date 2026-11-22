@@ -15,32 +15,28 @@ concurrency:
 
 jobs:
   validate:
-    name: validate (${{ matrix.os }}, Python ${{ matrix.python }})
+    name: validate (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         # Self-hosted runner on Neo's Mac: GitHub-hosted jobs are blocked by an account billing problem.
         # Restore [ubuntu-latest, macos-latest] once billing is fixed.
         os: [self-hosted]
-        python: ["3.10", "3.x"]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version: ${{ matrix.python }}
+      # setup-python cannot install into /Users/runner on a self-hosted Mac, so the runner's own python3 (3.10+) is used.
       - name: Config validator and unit tests
         run: sh scripts/validate.sh
-      - name: Install dev dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Property tests (ci profile)
         env:
-          HARNESS_OFFLINE: "1"
           HYPOTHESIS_PROFILE: ci
         run: sh scripts/test-properties.sh
       - name: Coverage gate (90 percent line, 80 percent branch)
-        if: matrix.python == '3.x'
-        run: sh scripts/coverage.sh
+        run: |
+          python3 -m venv build/ci-venv
+          build/ci-venv/bin/python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          PATH="$PWD/build/ci-venv/bin:$PATH" sh scripts/coverage.sh

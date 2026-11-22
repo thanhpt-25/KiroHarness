@@ -58,7 +58,7 @@ class CiWorkflows(unittest.TestCase):
     def test_ci_runs_validation_and_properties_on_the_matrix(self):
         # Validates: agent-harness-platform/R2.1, agent-harness-platform/R2.3
         text = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
-        for needle in ("push:", "pull_request:", "self-hosted", '"3.10"', '"3.x"',
+        for needle in ("push:", "pull_request:", "self-hosted",
                        "scripts/validate.sh", "scripts/test-properties.sh", "HYPOTHESIS_PROFILE: ci"):
             self.assertIn(needle, text, detail("ci.yml", needle, "missing"))
 
