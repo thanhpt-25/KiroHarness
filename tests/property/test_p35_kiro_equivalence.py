@@ -16,6 +16,19 @@ RELEASE_GATES = '\n## Harness Release Gates\n\nA release of a project that ships
 OTHERS = ["claude-code", "cursor", "copilot"]
 
 
+# The verified Kiro range replaced the baseline's single minimum-version line (agent-harness-platform R3.5).
+TECH_OLD = (
+    "- Minimum supported Kiro IDE version: 1.1.14. Exit-code blocking for\n"
+    "  `PreToolUse` hooks was measured on this version.\n"
+)
+TECH_NEW = (
+    "- Verified Kiro IDE versions: minimum 1.5.11, maximum 1.5.11 (verified\n"
+    "  2026-11-22). Records are in `docs/verification/kiro/1.5.11/`. Older\n"
+    "  versions are untested here; exit-code blocking for `PreToolUse` hooks was\n"
+    "  measured by a third party on 1.1.14.\n"
+)
+
+
 class KiroEquivalence(unittest.TestCase):
     @settings(suppress_health_check=[HealthCheck.too_slow], max_examples=20)
     @given(st.lists(st.sampled_from(OTHERS), unique=True))
@@ -34,6 +47,8 @@ class KiroEquivalence(unittest.TestCase):
                     expected += UNTRUSTED
                 if rel.as_posix() == ".kiro/steering/release-checklist.md":
                     expected += RELEASE_GATES
+                if rel.as_posix() == ".kiro/steering/tech.md":
+                    expected = expected.replace(TECH_OLD, TECH_NEW)
                 with self.subTest(file=rel.as_posix()):
                     self.assertEqual((root / rel).read_text(encoding="utf-8"), expected)
 
