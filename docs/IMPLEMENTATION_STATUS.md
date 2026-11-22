@@ -56,6 +56,7 @@ This inventory reflects the workspace tree reviewed on 2026-11-21, after Phase 0
 
 ## Remaining gaps and caveats
 
+0. **Kiro 1.5.11 verification gaps (2026-11-22).** Four of five checks are recorded in `docs/verification/kiro/1.5.11/`: destructive guard, prompt secret scan and git MCP are `pass`; the risky guard and quality hook are `partial`. Nobody confirmed that Kiro showed an approval dialog for the risky guard, `delete_file` was not tested, the `PostTaskExec` trigger was not observed, the quality hook output was not seen in the Kiro UI, and a `repo_path` outside the repo was not tried for the git MCP server. The records and `.expect.json` expectations came from a Kiro agent run, so treat them as evidence to review, not as independent proof.
 1. **Kiro IDE integration is environment-specific.** Hook payload fields, exit-code blocking, permissionDecision ask behavior, event ordering, and actual file paths need the manual integration checks in docs/CUSTOMIZING.md against a supported Kiro version.
 2. **MCP integration is opt-in.** The checked-in integration suite is not part of the offline validation command; server downloads/startup require network access and the configured uvx runtime.
 3. **CI is new.** The workflows are in place but have not completed a run yet; branch protection that requires the `ci` check is a repository setting to enable on GitHub.

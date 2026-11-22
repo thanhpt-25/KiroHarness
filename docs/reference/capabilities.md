@@ -9,7 +9,7 @@ Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks),
 | Claude Code | documented | enforced | enforced | enforced | enforced |
 | GitHub Copilot | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
 | Cursor | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
-| Kiro IDE | documented | enforced | enforced | enforced | partial |
+| Kiro IDE | verified | enforced | enforced | enforced | partial |
 
 ## Files the Generator writes
 
@@ -24,11 +24,14 @@ Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks),
 - Claude Code: on_save and post_task quality hooks are Kiro-specific and are not rendered for Claude Code.
 - GitHub Copilot: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
 - Cursor: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
-- Kiro IDE: Kiro read and write tool IDs (fs_read, read_file, fs_write, write_file) are assumed from the documentation and not yet recorded from a real IDE, so protected-path checks for file tools are unverified. Import payloads with scripts/import-payloads.sh and correct tool_map.
+- Kiro IDE: Kiro 1.5.11 sends read_file and fs_write with tool_input.path (recorded). fs_read and write_file were not observed and remain assumed from the documentation.
+- Kiro IDE: The Risky_Tool_Guard blocked a shell rm on 1.5.11 (the call was denied with the guard reason), but nobody confirmed that Kiro showed an approval dialog, and delete_file was not tested. Treat ask as unconfirmed.
+- Kiro IDE: The PostTaskExec trigger was not observed on 1.5.11, so the post-task-tests hook has no recorded payload.
+- Kiro IDE: The quality-on-save hook receives the PostFileSave payload (replay passes), but its output was not seen in the Kiro UI.
 
 ## Verification
 
 - Claude Code: https://code.claude.com/docs/en/hooks, /permissions, /mcp, /memory read on 2026-11-21; no Manual_Check_Record yet (2026-11-21)
 - GitHub Copilot: none; output format follows the design mapping and is unverified (2026-11-21)
 - Cursor: none; output format follows the design mapping and is unverified (2026-11-21)
-- Kiro IDE: Template design research (third-party measurement of exit-code blocking on 1.1.14); IDE smoke test pending, see docs/verification/kiro/RUNBOOK.md (2026-11-21)
+- Kiro IDE: Manual_Check_Records in docs/verification/kiro/1.5.11/ and payloads in tests/fixtures/payloads/kiro/1.5.11/ (Kiro 1.5.11, Darwin arm64); exit-code blocking on 1.1.14 was measured earlier by a third party (2026-11-22)

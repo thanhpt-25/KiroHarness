@@ -4,12 +4,12 @@
   "agents": {
     "kiro": {
       "label": "Kiro IDE",
-      "status": "documented",
+      "status": "verified",
       "verified": {
-        "min": "1.1.14",
-        "max": "1.1.14",
-        "date": "2026-11-21",
-        "source": "Template design research (third-party measurement of exit-code blocking on 1.1.14); IDE smoke test pending, see docs/verification/kiro/RUNBOOK.md"
+        "min": "1.5.11",
+        "max": "1.5.11",
+        "date": "2026-11-22",
+        "source": "Manual_Check_Records in docs/verification/kiro/1.5.11/ and payloads in tests/fixtures/payloads/kiro/1.5.11/ (Kiro 1.5.11, Darwin arm64); exit-code blocking on 1.1.14 was measured earlier by a third party"
       },
       "guidance": {
         "always": ".kiro/steering/*.md (inclusion: always)",
@@ -101,7 +101,10 @@
         "protected_paths": "partial"
       },
       "gaps": [
-        "Kiro read and write tool IDs (fs_read, read_file, fs_write, write_file) are assumed from the documentation and not yet recorded from a real IDE, so protected-path checks for file tools are unverified. Import payloads with scripts/import-payloads.sh and correct tool_map."
+        "Kiro 1.5.11 sends read_file and fs_write with tool_input.path (recorded). fs_read and write_file were not observed and remain assumed from the documentation.",
+        "The Risky_Tool_Guard blocked a shell rm on 1.5.11 (the call was denied with the guard reason), but nobody confirmed that Kiro showed an approval dialog, and delete_file was not tested. Treat ask as unconfirmed.",
+        "The PostTaskExec trigger was not observed on 1.5.11, so the post-task-tests hook has no recorded payload.",
+        "The quality-on-save hook receives the PostFileSave payload (replay passes), but its output was not seen in the Kiro UI."
       ],
       "hooks": true
     },

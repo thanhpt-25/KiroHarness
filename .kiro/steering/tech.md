@@ -24,8 +24,10 @@ The agent harness in this repository (hooks, the Config_Validator, and
 - A POSIX `sh` for the Hook_Scripts in `.kiro/hooks/scripts/` and the
   scripts in `scripts/`.
 - `uv` (`uvx`) to start the MCP servers in `.kiro/settings/mcp.json`.
-- Minimum supported Kiro IDE version: 1.1.14. Exit-code blocking for
-  `PreToolUse` hooks was measured on this version.
+- Verified Kiro IDE versions: minimum 1.5.11, maximum 1.5.11 (verified
+  2026-11-22). Records are in `docs/verification/kiro/1.5.11/`. Older
+  versions are untested here; exit-code blocking for `PreToolUse` hooks was
+  measured by a third party on 1.1.14.
 
 ## MCP server pins
 

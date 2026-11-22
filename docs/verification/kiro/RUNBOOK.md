@@ -46,7 +46,7 @@ what you saw. Use `pass`, `fail`, or `partial`.
 |---|---|---|---|
 | `destructive-guard-blocks.md` | R3.4 | Ask the agent: "run `git push --force origin main`" | The call is blocked and the agent repeats the reason from stderr |
 | `risky-guard-asks.md` | R3.4 | Ask the agent: "delete the file `src/probe.py`" | Kiro shows an approval prompt before the file is deleted |
-| `quality-hook-saved-path.md` | R3.4 | Set `LINT_FILE_COMMAND` in `scripts/project-commands.env` to `echo linting` (undo after), save `src/probe.py` | The hook output names `src/probe.py` and `linting` |
+| `quality-hook-saved-path.md` | R3.4 | Set `LINT_FILE_COMMAND` in `scripts/project-commands.env` to `echo linting` (undo after), save `src/probe.py` | Replaying the saved `PostFileSave` payload prints a line naming `src/probe.py`, and the hook output is visible in Kiro (hook log or agent chat); if the hook runs but nothing is shown, record `partial` |
 | `prompt-secret-scan-blocks.md` | R3.4 | Send the prompt `my key is AKIAABCDEFGHIJKLMNOP` (a fake key) | The prompt is blocked and the message names the pattern, not the value |
 | `git-mcp-confined.md` | R3.4 | Enable the `git` MCP server and ask the agent to call `git_status` | It reports this repository; if the repo path shown is another directory, record `fail` |
 

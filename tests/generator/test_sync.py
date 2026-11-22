@@ -175,7 +175,7 @@ class Sync(unittest.TestCase):
         with SourceRoot(ALL) as root:
             run_cli(root, "sync")
             text = (root / "docs/reference/capabilities.md").read_text()
-        self.assertIn("| Kiro IDE | documented | enforced | enforced | enforced | partial |", text)
+        self.assertIn("| Kiro IDE | verified | enforced | enforced | enforced | partial |", text)
         self.assertIn("| Cursor | unverified | guidance-only | guidance-only | guidance-only | guidance-only |", text)
 
 

@@ -67,7 +67,7 @@
       "sources": ["harness/guidance/structure.md"]
     },
     ".kiro/steering/tech.md": {
-      "sha256": "3e1e3730ae997c0ac548381b617c461d175e0ff92f860bbf16bb665795c4fec9",
+      "sha256": "887ba4e5c5880beeba4f14bb248d050d80cfd8b5eeaab02a39434b1c2c624d28",
       "sources": ["harness/guidance/tech.md"]
     },
     ".kiro/steering/testing.md": {
@@ -75,7 +75,7 @@
       "sources": ["harness/guidance/testing.md"]
     },
     "docs/reference/capabilities.md": {
-      "sha256": "42e101f6ccf999f6ca73710605f71b744a3cfd4614f028e34e2b2d08bd145c4a",
+      "sha256": "b110c71f79537caa3c24a21de5cf650c6c1d999e1095250a36e5e8b7595852c7",
       "sources": ["harness/capabilities.json"]
     }
   }
