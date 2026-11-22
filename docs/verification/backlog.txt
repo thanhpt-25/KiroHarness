@@ -6,6 +6,4 @@ agent-harness-platform/R1.4
 agent-harness-platform/R15.5
 agent-harness-platform/R2.5
 agent-harness-platform/R2.6
-agent-harness-platform/R3.5
-agent-harness-platform/R3.6
 agent-harness-platform/R8.5
