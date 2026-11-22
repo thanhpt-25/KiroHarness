@@ -56,7 +56,7 @@ This inventory reflects the workspace tree reviewed on 2026-11-21, after Phase 0
 
 ## Remaining gaps and caveats
 
-1. **Kiro IDE integration is environment-specific.** Hook payload fields, exit-code blocking, permissionDecision ask behavior, event ordering, and actual file paths need the manual integration checks in docs/CUSTOMIZING.md against a supported Kiro version.
+1. **Kiro IDE integration is environment-specific.** Hook payload fields, exit-code blocking, permissionDecision ask behavior, event ordering, and actual file paths need the manual integration checks in docs/CUSTOMIZING.md against a supported Kiro version. Kiro 1.5.11 was verified on 2026-11-21 (`docs/verification/kiro/1.5.11/`): the destructive guard, prompt secret scan and git MCP confinement pass. The risky-tool ask is partial because nobody confirmed that the approval prompt appeared in the UI. Quality-on-save is partial because `PostFileSave` delivers the path but Kiro showed no hook output. `PostTaskExec` was not observed. The 46 recorded payloads run in `tests/hooks/test_kiro_fixtures.py`.
 2. **MCP integration is opt-in.** The checked-in integration suite is not part of the offline validation command; server downloads/startup require network access and the configured uvx runtime.
 3. **CI is new.** The workflows are in place but have not completed a run yet; branch protection that requires the `ci` check is a repository setting to enable on GitHub.
 4. **Task tracking is reconciled by hand.** The Template tasks.md matches the code as of the reconciliation table above. Until `scripts/harness trace` exists, keep checkboxes in sync manually.

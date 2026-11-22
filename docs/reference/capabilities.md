@@ -9,7 +9,7 @@ Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks),
 | Claude Code | documented | enforced | enforced | enforced | enforced |
 | GitHub Copilot | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
 | Cursor | unverified | guidance-only | guidance-only | guidance-only | guidance-only |
-| Kiro IDE | documented | enforced | enforced | enforced | partial |
+| Kiro IDE | verified | enforced | enforced | enforced | partial |
 
 ## Files the Generator writes
 
@@ -24,11 +24,14 @@ Which protections each Agent gets. Levels: **enforced** (a hook blocks or asks),
 - Claude Code: on_save and post_task quality hooks are Kiro-specific and are not rendered for Claude Code.
 - GitHub Copilot: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
 - Cursor: Guidance only: this Agent's hook and permission formats are not verified (official documentation was not reachable on 2026-11-21), so no guard is enforced for it.
-- Kiro IDE: Kiro read and write tool IDs (fs_read, read_file, fs_write, write_file) are assumed from the documentation and not yet recorded from a real IDE, so protected-path checks for file tools are unverified. Import payloads with scripts/import-payloads.sh and correct tool_map.
+- Kiro IDE: Kiro 1.5.11 payloads confirm the tool IDs execute_bash, read_file and fs_write and their path field. fs_read, write_file and delete_file were not seen in a recording, so protected-path checks for those IDs stay unverified.
+- Kiro IDE: PostTaskExec was not observed on Kiro 1.5.11, so the post-task hook has no recorded payload.
+- Kiro IDE: Risky-tool ask on Kiro 1.5.11 is partial: the guard matched and the call did not run, but nobody confirmed that an approval prompt appeared in the UI (docs/verification/kiro/1.5.11/risky-guard-asks.md).
+- Kiro IDE: Quality-on-save on Kiro 1.5.11 is partial: PostFileSave delivers the saved path, but Kiro showed no hook output after an editor save (docs/verification/kiro/1.5.11/quality-hook-saved-path.md).
 
 ## Verification
 
 - Claude Code: https://code.claude.com/docs/en/hooks, /permissions, /mcp, /memory read on 2026-11-21; no Manual_Check_Record yet (2026-11-21)
 - GitHub Copilot: none; output format follows the design mapping and is unverified (2026-11-21)
 - Cursor: none; output format follows the design mapping and is unverified (2026-11-21)
-- Kiro IDE: Template design research (third-party measurement of exit-code blocking on 1.1.14); IDE smoke test pending, see docs/verification/kiro/RUNBOOK.md (2026-11-21)
+- Kiro IDE: Manual_Check_Records for Kiro 1.5.11 (Kiro Agent 0.66.123, macOS arm64) in docs/verification/kiro/1.5.11/: 3 pass, 2 partial; 46 recorded payloads in tests/fixtures/payloads/kiro/1.5.11/ (2026-11-21)

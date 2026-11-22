@@ -1,0 +1,1 @@
+{"session_id":"sess_3451be9e-40a6-4ed8-b225-a59e6b70b47d","hook_event_name":"PreToolUse","cwd":"/WORKSPACE","tool_name":"execute_bash","tool_input":{"command":"git status --short; ls tests/fixtures/payloads/kiro 2>&1","description":"Show git status","cwd":"/WORKSPACE","run_in_background":false,"timeout":30000}}
