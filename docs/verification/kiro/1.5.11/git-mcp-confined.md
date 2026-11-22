@@ -19,7 +19,7 @@ Pass means: It reports this repository. If the repo path shown is another direct
 
 ## Observed
 
-The `git` MCP server is configured with `--repository .`. The agent called `git_status` with `repo_path: "."`. It reported branch `main`, up to date with `origin/main`, and the untracked paths `docs/verification/kiro/1.5.11/`, `src/` and `tests/fixtures/payloads/kiro/1.5.11/`. These match `git status` run directly in `/Users/thanhpt/Projects/KiroHarness`, so the server reports this repository. The call ran without an approval prompt because `git_status` is on the server's `autoApprove` list. Not tested: a `repo_path` outside this repository.
+The `git` MCP server is configured with `--repository .`. The agent called `git_status` with `repo_path: "."`. It reported branch `main`, up to date with `origin/main`, and the untracked paths `docs/verification/kiro/1.5.11/`, `src/` and `tests/fixtures/payloads/kiro/1.5.11/`. These match `git status` run directly in `<repo>`, so the server reports this repository. The call ran without an approval prompt because `git_status` is on the server's `autoApprove` list. Not tested: a `repo_path` outside this repository.
 
 
 ## Notes

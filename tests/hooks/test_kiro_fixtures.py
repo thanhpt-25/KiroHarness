@@ -9,7 +9,7 @@ without changing this file.
 
 (agent-harness-platform Requirements 3.2 and 3.3)
 """
-# Validates: agent-harness-platform/R3.2, agent-harness-platform/R3.3, agent-harness-platform/R9.2
+# Validates: agent-harness-platform/R3.2, agent-harness-platform/R3.3, agent-harness-platform/R3.5, agent-harness-platform/R3.6, agent-harness-platform/R9.2
 
 import json
 import unittest
@@ -50,6 +50,20 @@ class KiroFixtures(unittest.TestCase):
         recorded = {p.parent.name for _v, p in payload_cases()}
         self.assertEqual(sorted(triggers - recorded), [],
                          detail("enabled hook triggers", "a fixture for each", sorted(triggers - recorded)))
+
+    def test_verified_range_is_stated_and_gaps_recorded(self):
+        # Validates: agent-harness-platform/R3.5, agent-harness-platform/R3.6
+        import pathlib
+        root = pathlib.Path(__file__).resolve().parents[2]
+        kiro = json.loads((root / "harness" / "capabilities.json").read_text(encoding="utf-8"))["agents"]["kiro"]
+        lo, hi = kiro["verified"]["min"], kiro["verified"]["max"]
+        for rel in ("harness/guidance/tech.md", "README.md"):
+            text = (root / rel).read_text(encoding="utf-8")
+            for version in {lo, hi}:
+                self.assertIn(version, text, detail(rel, f"verified version {version}", "missing"))
+        self.assertTrue(kiro["gaps"], detail("kiro gaps", "recorded gaps", "empty"))
+        status = (root / "docs" / "IMPLEMENTATION_STATUS.md").read_text(encoding="utf-8")
+        self.assertIn(lo, status, detail("IMPLEMENTATION_STATUS.md", f"Kiro {lo} gaps", "missing"))
 
     def test_every_payload_has_expectations_for_the_hooks_that_receive_it(self):
         # Validates: agent-harness-platform/R3.3

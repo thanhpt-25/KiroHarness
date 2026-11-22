@@ -20,6 +20,8 @@ A reusable Kiro IDE harness for adding project context, safety checks, quality h
 - Hypothesis from requirements-dev.txt to run property tests. The regular validation command does not require Hypothesis.
 - A compatible Kiro IDE for the IDE hooks. The steering and hook configuration is designed for Kiro IDE; verify integration behavior in your installed version.
 
+Verified Kiro IDE versions: minimum 1.5.11, maximum 1.5.11 (verified 2026-11-21; see `docs/verification/kiro/1.5.11/`). Known gaps are listed under Kiro in `harness/capabilities.json` and `docs/IMPLEMENTATION_STATUS.md`.
+
 ## Setup
 
 1. Copy the Template into the target repository, or clone this repository and use it as your starting project.
