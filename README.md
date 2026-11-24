@@ -168,6 +168,8 @@ The optional pre-commit Git hook runs scripts/validate.sh. The commit-msg hook c
 
 Start at [docs/README.md](docs/README.md): a tutorial, how-to guides, reference pages and explanations. Release history is in [CHANGELOG.md](CHANGELOG.md).
 
+Hướng dẫn sử dụng bằng tiếng Việt: [docs/HUONG_DAN_SU_DUNG.md](docs/HUONG_DAN_SU_DUNG.md).
+
 ## Placeholders
 
 Replace the following project-specific placeholders before adopting the steering guidance. Notation placeholders used only in this README, specification, or documentation are intentionally examples and do not need replacement.

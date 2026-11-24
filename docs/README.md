@@ -7,6 +7,7 @@ Organized by what you are trying to do. Every document in `docs/` is linked from
 
 ## How-to guides (get something done)
 - [Install and upgrade the Harness](how-to/install-and-upgrade.md)
+- [Hướng dẫn sử dụng (tiếng Việt)](HUONG_DAN_SU_DUNG.md): cài đặt, steering, hook, MCP, validator, lint và test
 - [Enable another Agent](how-to/enable-an-agent.md)
 - [Write a spec and keep it traceable](how-to/write-a-spec.md)
 - [Run the evals and quality gates](how-to/run-evals-and-gates.md)
